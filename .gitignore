@@ -18,7 +18,8 @@
 ################
 #  Eclipse
 ################
-bin/
+*/bin/
+*/.settings
 
 # STS (Spring Tool Suite)
 .springBeans
@@ -26,11 +27,11 @@ bin/
 ################
 #  Maven
 ################
-target/
+*/target
 pom.xml.*
 
 ################
 #  Gradle
 ################
-/.gradle/
-/build/
+*/.gradle
+*/build
