@@ -36,8 +36,9 @@ subprojects{
 
 bizProjects.each { subProject ->
 
+/*
     // 業務プロジェクトからJarをコピー
-    task copyJar << {
+    task copyJars << {
 
         copy {
             from libsDir
@@ -48,7 +49,7 @@ bizProjects.each { subProject ->
             from configurations.compile
             into "$distsDir/$jarDir/dependencies"
         }
-    }
+    }*/
 }
 
 // 各プロジェクトの配布物をマスターにコピー
