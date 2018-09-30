@@ -7,6 +7,7 @@ ext {
     tempDistsDir = "$distsDir/$deployDistsDir"
 }
 
+// サブプロジェクト共通
 subprojects{
 
     // 外部リソースをコピー
@@ -34,22 +35,25 @@ subprojects{
 
 }
 
+// 業務プロジェクト共通
 bizProjects.each { subProject ->
 
-/*
-    // 業務プロジェクトからJarをコピー
-    task copyJars << {
+    project( ":$subProject.name") {
 
-        copy {
-            from libsDir
-            into "$distsDir/$jarDir"
-        }
+        // 業務プロジェクトからJarをコピー
+        task copyJars << {
 
-        copy {
-            from configurations.compile
-            into "$distsDir/$jarDir/dependencies"
+            copy {
+                from libsDir
+                into "$distsDir/$jarDir"
+            }
+
+            copy {
+                from configurations.compile
+                into "$distsDir/$jarDir/dependencies"
+            }
         }
-    }*/
+    }
 }
 
 // 各プロジェクトの配布物をマスターにコピー
@@ -70,6 +74,7 @@ task zipDists(type: Zip, dependsOn: copyDistsToMaster)  {
     from tempDistsDir
 }
 
+// サーバ接続情報
 remotes {
 
     transpoter {
@@ -83,15 +88,16 @@ remotes {
         host = deployHost
         user = deployUser
         password = deployPassword
-
     }
 
 }
 
+// SSH共通設定　
 ssh.settings {
     knownHosts = allowAnyHosts
 }
 
+// デプロイ
 task deploy << {
 
     def deployWorkDir = '/WORK/deploy'
@@ -100,23 +106,21 @@ task deploy << {
 
         session(remotes.transpoter)  {
 
-            //execute("mkdir -p -m $modeDir $deployWorkDir")
-            //put from: deployWorkDir, into: deployWorkDir
-//            unzip
+            //execute("mkdir -p -m $modeDir $deployWorkDir") // 作業ディレクトリ作成
+            //put from: deployWorkDir, into: deployWorkDir // サーバ転送
+//            unzip // 解凍
 
         }
 
         session(remotes.deployer)  {
 
-            //execute("rm -rf ")
-            //execute("cp -ra $deployDistsDir")
+            //execute("rm -rf ") // 過去バージョンのJarを削除
+            //execute("cp -ra $deployDistsDir") // デプロイ
 
             // 権限変更
             execute("chmod $modeShell $deployDistsDir/$shellDir")
             execute("chmod $modeConf $deployDistsDir/$confDir")
             execute("chmod $modeArchive $deployDistsDir/$jarDir")
         }
-
-
     }
 }

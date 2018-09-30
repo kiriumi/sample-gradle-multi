@@ -1,10 +1,11 @@
 plugins {
   id 'org.hidetake.ssh' version '2.9.0'
+  id 'com.github.spotbugs' version '1.6.4'
 }
 
-ext {
-    baseGroup = 'sample.gradle.multi.'
+group = 'sample.gradle.multi'
 
+ext {
     // 共有プロジェクト
     sharedProjects = subprojects
     sharedProjects.removeIf{ subProject -> return !subProject.name.contains('shared') }
@@ -12,6 +13,60 @@ ext {
     // 業務プロジェクト
     bizProjects  = subprojects
     bizProjects.removeIf{ subProject -> return subProject.name.contains('shared') }
+}
+
+// 全プロジェクト共通
+allprojects {
+
+    apply plugin: 'java'
+
+    tasks.withType(JavaCompile){ options.encoding = 'UTF-8' }
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+// サブプロジェクト共通
+subprojects{
+
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+    apply plugin: 'checkstyle'
+    apply plugin: 'jacoco'
+    apply plugin: 'com.github.spotbugs'
+
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+
+    version = branchName + '.' + environment
+
+    dependencies {
+
+        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+
+        // 外部リソースのクラスパス
+        runtime files("$deployDistsDir/$confDir")
+    }
+
+    checkstyle {
+        configFile = new File(configDir,  'sun_checks.xml')
+        ignoreFailures = true
+    }
+
+    checkstyleTest {
+        excludes = ['**/*']
+    }
+
+    spotbugs {
+        ignoreFailures = true
+    }
+
+    spotbugsTest {
+        excludes = ['**/*']
+    }
 }
 
 apply from: 'batch-build.gradle'

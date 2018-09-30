@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="off">
+
+    <Properties>
+        <Property name="logRootDir">./log</Property>
+        <Property name="logFilename">sample.log</Property>
+
+        <Property name="logBackupDir">${logRootDir}/bkup</Property>
+        <Property name="logBackupFilename">${logFilename}-%d{yyyy-MM-dd}.zip</Property>
+
+        <Property name="layout" value="%d{yyyy/MM/dd HH:mm:ss.SSS}\t%-5p\t%t\t%c\t%m%n" />
+    </Properties>
+
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${layout}"/>
+        </Console>
+
+        <RollingFile name="file" fileName="${logRootDir}/${logFilename}" filePattern="${logBackupDir}/${logBackupFilename}">
+            <PatternLayout pattern="${layout}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB" />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${logBackupDir}" maxDepth="1">
+                    <IfFileName glob="${logFilename}*" />
+                    <IfLastModified age="2d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+       <Logger name="sample.gradle.multi" level="info" additivity="false">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="file"/>
+       </Logger>
+    </Loggers>
+</Configuration>
