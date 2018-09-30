@@ -1,0 +1,2 @@
+apply from: 'build-java.gradle'
+apply from: 'deploy.gradle'

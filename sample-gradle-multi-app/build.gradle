@@ -1,0 +1,19 @@
+dependencies {
+
+    compile project(':sample-gradle-multi-shared')
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
+
+}
+
+task copyArchivesToDists << {
+
+    copy {
+        from libsDir
+        into "$distsDir/$archivesDir"
+    }
+
+    copy {
+        from configurations.compile
+        into "$distsDir/Java/dependencies"
+    }
+}

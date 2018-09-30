@@ -1,0 +1,42 @@
+allprojects {
+
+   apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects{
+
+    apply plugin: 'maven'
+
+    def projectGroup = {
+
+        def baseGroup = 'sample.gradle.multi.'
+        def suffix = ''
+
+        suffix = project.name.contains('shared') ? 'shared' : suffix
+
+        return "$baseGroup$suffix"
+    }
+
+    group projectGroup()
+    version = version + '.' + environment
+
+    dependencies {
+
+        testImplementation 'junit:junit:4.12'
+    }
+
+    if(project.name.contains("shared")) {
+
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    repository(url: "file://C:/Users/Kengo/.m2/repository")
+                }
+            }
+        }
+    }
+}

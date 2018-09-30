@@ -1,0 +1,36 @@
+################
+#  General
+################
+*.log
+*.zip
+*.tar
+*.gz
+*.rar
+
+################
+#  Java
+################
+*.class
+*.jar
+*.war
+*.ear
+
+################
+#  Eclipse
+################
+bin/
+
+# STS (Spring Tool Suite)
+.springBeans
+
+################
+#  Maven
+################
+target/
+pom.xml.*
+
+################
+#  Gradle
+################
+/.gradle/
+/build/
