@@ -18,7 +18,7 @@
 ################
 #  Eclipse
 ################
-*/bin/
+*/bin
 
 # STS (Spring Tool Suite)
 .springBeans
