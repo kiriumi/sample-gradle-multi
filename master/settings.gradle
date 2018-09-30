@@ -17,4 +17,4 @@ include 'services:webservice'
 
 //rootProject.name = 'master'
 
-includeFlat 'sample-gradle-multi-shared', 'sample-gradle-multi-app'
+includeFlat 'sample-gradle-multi-shared', 'sample-gradle-multi-app', 'sample-gradle-multi-web'
