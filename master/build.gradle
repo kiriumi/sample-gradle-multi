@@ -1,2 +1,18 @@
-apply from: 'build-java.gradle'
-apply from: 'deploy.gradle'
+plugins {
+  id 'org.hidetake.ssh' version '2.9.0'
+}
+
+ext {
+    baseGroup = 'sample.gradle.multi.'
+
+    // 共有プロジェクト
+    sharedProjects = subprojects
+    sharedProjects.removeIf{ subProject -> return !subProject.name.contains('shared') }
+
+    // 業務プロジェクト
+    bizProjects  = subprojects
+    bizProjects.removeIf{ subProject -> return subProject.name.contains('shared') }
+}
+
+apply from: 'batch-build.gradle'
+apply from: 'batch-deploy.gradle'

@@ -1,0 +1,121 @@
+/*
+ * マスターに配布物を集約し、デプロイする
+ * copyOuterResoucesToDists copyArchivesToDists zipDists
+ *
+ */
+ext {
+    tempDistsDir = "$distsDir/$deployDistsDir"
+}
+
+subprojects{
+
+    // 外部リソースをコピー
+    task copyDists << {
+
+        copy {
+            def outerShellDir = "$deployDistsDir/$shellDir"
+
+            from outerShellDir
+            if(environment.equals('SNAPSHOT')) { from "$outerShellDir$stageNo" } // 開発時は該当の面のシェルをコピー
+
+            into "$distsDir/$shellDir"
+        }
+
+        copy {
+            def outerConfDir = "$deployDistsDir/$confDir"
+
+            from outerConfDir
+            if(environment.equals('SNAPSHOT')) { from "$outerConfDir$stageNo" } // 開発時は該当の面の設定ファイルをコピー
+
+            into "$distsDir/$confDir"
+        }
+    }
+
+
+}
+
+bizProjects.each { subProject ->
+
+    // 業務プロジェクトからJarをコピー
+    task copyJar << {
+
+        copy {
+            from libsDir
+            into "$distsDir/$jarDir"
+        }
+
+        copy {
+            from configurations.compile
+            into "$distsDir/$jarDir/dependencies"
+        }
+    }
+}
+
+// 各プロジェクトの配布物をマスターにコピー
+task copyDistsToMaster <<  {
+
+    subprojects.each { subProject ->
+
+         copy {
+            from subProject.distsDir
+            into tempDistsDir
+        }
+    }
+}
+
+// 配布物を圧縮
+task zipDists(type: Zip, dependsOn: copyDistsToMaster)  {
+    archiveName = String.format('dists-%s.zip', new Date().format('yyyyMMdd'));
+    from tempDistsDir
+}
+
+remotes {
+
+    transpoter {
+        host = deployHost
+        user = deployUser
+        password = deployPassword
+
+    }
+
+    deployer {
+        host = deployHost
+        user = deployUser
+        password = deployPassword
+
+    }
+
+}
+
+ssh.settings {
+    knownHosts = allowAnyHosts
+}
+
+task deploy << {
+
+    def deployWorkDir = '/WORK/deploy'
+
+    ssh.run {
+
+        session(remotes.transpoter)  {
+
+            //execute("mkdir -p -m $modeDir $deployWorkDir")
+            //put from: deployWorkDir, into: deployWorkDir
+//            unzip
+
+        }
+
+        session(remotes.deployer)  {
+
+            //execute("rm -rf ")
+            //execute("cp -ra $deployDistsDir")
+
+            // 権限変更
+            execute("chmod $modeShell $deployDistsDir/$shellDir")
+            execute("chmod $modeConf $deployDistsDir/$confDir")
+            execute("chmod $modeArchive $deployDistsDir/$jarDir")
+        }
+
+
+    }
+}

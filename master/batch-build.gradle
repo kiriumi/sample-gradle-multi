@@ -1,0 +1,77 @@
+/*
+ * 各プロジェクトをビルドし、Mavenリポジトリにアップロードする
+ * clean build uploadArchives
+ *
+ */
+allprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+
+    tasks.withType(JavaCompile){ options.encoding = 'UTF-8' }
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+// サブプロジェクト共通
+subprojects{
+
+    apply plugin: 'maven'
+
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+
+    version = branchName + '.' + environment
+
+    dependencies {
+        testCompile 'junit:junit:4.12'
+
+        // 外部リソースのクラスパス
+        runtime files("$deployDistsDir/$confDir")
+    }
+}
+
+// 業務プロジェクト共通
+bizProjects.each { subProject ->
+    group = baseGroup + 'app'
+}
+
+// 共有プロジェクト共通
+sharedProjects.each { subProject ->
+
+    group = baseGroup + 'shared'
+
+    configurations {
+        deployerJars
+    }
+
+    dependencies {
+        deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
+    }
+
+    project( ":$subProject.name") {
+
+        // ローカルのMavenリポジトリの場合
+        uploadArchives {
+            repositories.mavenDeployer {
+                    repository(url: "file://C:/Users/Kengo/.m2/repository")
+                }
+        }
+
+        /*
+        // 社内Mavenリポジトリの場合
+        uploadArchives {
+
+            repositories.mavenDeployer {
+                configuration = configurations.deployerJars
+
+                repository(url: "scp://repos.mycompany.com/releases") {
+                    authentication(userName: "me", password: "myPassword")
+                }
+            }
+        }
+        */
+    }
+}
