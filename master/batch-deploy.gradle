@@ -108,7 +108,7 @@ task deploy << {
 
             //execute("mkdir -p -m $modeDir $deployWorkDir") // 作業ディレクトリ作成
             //put from: deployWorkDir, into: deployWorkDir // サーバ転送
-//            unzip // 解凍
+            // unzip // 解凍
 
         }
 
