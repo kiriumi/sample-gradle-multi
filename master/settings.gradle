@@ -1,2 +1,13 @@
 // サブプロジェクト
-includeFlat 'sample-gradle-multi-shared', 'sample-gradle-multi-app', 'sample-gradle-multi-web'
+def subprojectNamese = ['sample-gradle-multi-shared', 'sample-gradle-multi-app', 'sample-gradle-multi-web']
+
+def workspaceDir = settingsDir.parent
+def includedProjects = []
+
+def subprojectTree = fileTree(dir: workspaceDir, includes: subprojectNamese)
+subprojectTree.visit { x -> includedProjects.add(x.name) }
+
+// 同階層内に存在するサブプロジェクトのみインクルード
+includedProjects.each { includedProject ->
+    includeFlat includedProject
+}
