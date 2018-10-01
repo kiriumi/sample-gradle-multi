@@ -3,20 +3,8 @@ plugins {
   id 'com.github.spotbugs' version '1.6.4'
 }
 
-ext {
-    // 共有プロジェクト
-    sharedProjects = subprojects
-    sharedProjects.removeIf{ subProject -> return !subProject.name.contains('shared') }
-
-    // 業務プロジェクト
-    bizProjects  = subprojects
-    bizProjects.removeIf{ subProject -> return subProject.name.contains('shared') }
-}
-
 // 全プロジェクト共通
 allprojects {
-
-    apply plugin: 'java'
 
     tasks.withType(JavaCompile){ options.encoding = 'UTF-8' }
 
@@ -29,7 +17,7 @@ allprojects {
 // サブプロジェクト共通
 subprojects{
 
-    apply plugin: 'eclipse'
+    apply plugin: 'java'
     apply plugin: 'maven'
     apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
@@ -52,24 +40,6 @@ subprojects{
         runtime files("$deployDistsDir/$confDir")
     }
 
-    // ソースJar作成
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allJava
-     }
-
-    // JavadocJar作成
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc.destinationDir
-    }
-
-    // Mavenリポジトリへのアップロード対象に含める
-    artifacts {
-        archives sourcesJar
-        archives javadocJar
-    }
-
     checkstyle {
         configFile = new File(configDir,  'sun_checks.xml')
         ignoreFailures = true
@@ -88,5 +58,5 @@ subprojects{
     }
 }
 
-apply from: 'batch-build.gradle'
-apply from: 'batch-deploy.gradle'
+apply from: 'build-shared.gradle'
+apply from: 'deploy-batch.gradle'

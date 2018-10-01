@@ -1,62 +1,63 @@
 /*
- * マスターに配布物を集約し、デプロイする
+ * バッチ関連のリソースをマスターに集約し、デプロイする
  * copyOuterResoucesToDists copyArchivesToDists zipDists
  *
  */
+ apply plugin: 'java'
+
 ext {
-    tempDistsDir = "$distsDir/$deployDistsDir"
+    // バッチプロジェクト
+    batchProjects  = ['sample-gradle-multi-shared', 'sample-gradle-multi-app']
+    batchBizProject = 'sample-gradle-multi-app'
+    distDirs = [shellDir, confDir]
+
+    tempDistsDir = "$distsDir/$deployRootDir"
 }
 
-// サブプロジェクト共通
-subprojects{
+// バッチプロジェクト共通
+batchProjects.each { batchProject ->
 
-    // 外部リソースをコピー
-    task copyDists << {
+    project( ":$batchProject") {
 
-        copy {
-            def outerShellDir = "$deployDistsDir/$shellDir"
+        // 外部リソースをコピー
+        task copyDists << {
 
-            from outerShellDir
-            if(environment.equals('SNAPSHOT')) { from "$outerShellDir$stageNo" } // 開発時は該当の面のシェルをコピー
+            distDirs.each { targetDir ->
 
-            into "$distsDir/$shellDir"
-        }
+                copy {
+                    from "$deployRootDir/$targetDir"
 
-        copy {
-            def outerConfDir = "$deployDistsDir/$confDir"
+                    if(!environment.equals('REL')) {
+                        // 開発時は該当の面のシェルをコピー
+                        from "$deployRootDir/$targetDir" + '_' + environment
+                    }
 
-            from outerConfDir
-            if(environment.equals('SNAPSHOT')) { from "$outerConfDir$stageNo" } // 開発時は該当の面の設定ファイルをコピー
-
-            into "$distsDir/$confDir"
-        }
-    }
-
-
-}
-
-// 業務プロジェクト共通
-bizProjects.each { subProject ->
-
-    project( ":$subProject.name") {
-
-        // 業務プロジェクトからJarをコピー
-        task copyJars << {
-
-            copy {
-                from libsDir
-                into "$distsDir/$jarDir"
-            }
-
-            copy {
-                from configurations.compile
-                into "$distsDir/$jarDir/dependencies"
+                    into "$distsDir/$targetDir"
+                }
             }
         }
     }
 }
 
-// 各プロジェクトの配布物をマスターにコピー
+// 業務バッチプロジェクト
+project( ":$batchBizProject") {
+
+    // 業務バッチプロジェクトからJarをコピー
+    task copyJars << {
+
+        copy {
+            from libsDir
+            into "$distsDir/$jarDir"
+        }
+
+        copy {
+            from configurations.compile
+            into "$distsDir/$jarDir/dependencies"
+        }
+    }
+}
+
+// 全バッチプロジェクトのリソースをマスターにコピー
 task copyDistsToMaster <<  {
 
     subprojects.each { subProject ->
@@ -115,12 +116,12 @@ task deploy << {
         session(remotes.deployer)  {
 
             //execute("rm -rf ") // 過去バージョンのJarを削除
-            //execute("cp -ra $deployDistsDir") // デプロイ
+            //execute("cp -ra $deployRootDir") // デプロイ
 
             // 権限変更
-            execute("chmod $modeShell $deployDistsDir/$shellDir")
-            execute("chmod $modeConf $deployDistsDir/$confDir")
-            execute("chmod $modeArchive $deployDistsDir/$jarDir")
+            execute("chmod $modeShell $deployRootDir/$shellDir")
+            execute("chmod $modeConf $deployRootDir/$confDir")
+            execute("chmod $modeArchive $deployRootDir/$jarDir")
         }
     }
 }
