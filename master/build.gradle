@@ -3,8 +3,6 @@ plugins {
   id 'com.github.spotbugs' version '1.6.4'
 }
 
-group = 'sample.gradle.multi'
-
 ext {
     // 共有プロジェクト
     sharedProjects = subprojects
@@ -24,6 +22,7 @@ allprojects {
 
     repositories {
         mavenCentral()
+        mavenLocal()
     }
 }
 
@@ -36,11 +35,13 @@ subprojects{
     apply plugin: 'jacoco'
     apply plugin: 'com.github.spotbugs'
 
+    group = 'sample.gradle.multi'
+    version = branchName + '.' + environment
+
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
 
-    version = branchName + '.' + environment
-
+    // 依存関係
     dependencies {
 
         compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
@@ -49,6 +50,24 @@ subprojects{
 
         // 外部リソースのクラスパス
         runtime files("$deployDistsDir/$confDir")
+    }
+
+    // ソースJar作成
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allJava
+     }
+
+    // JavadocJar作成
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    // Mavenリポジトリへのアップロード対象に含める
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
     }
 
     checkstyle {
