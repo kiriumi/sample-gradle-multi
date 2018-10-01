@@ -37,7 +37,7 @@ subprojects{
         testCompile group: 'junit', name: 'junit', version: '4.12'
 
         // 外部リソースのクラスパス
-        runtime files("$deployDistsDir/$confDir")
+        runtime files("$deployRootDir/$confDir")
     }
 
     checkstyle {
