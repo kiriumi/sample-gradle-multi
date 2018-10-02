@@ -44,25 +44,22 @@ sharedProjects.each { sharedProject ->
             deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
         }
 
-        // ローカルのMavenリポジトリの場合
-        uploadArchives {
-            repositories.mavenDeployer {
-                    repository(url: "file://C:/Users/Kengo/.m2/repository")
-                }
-        }
-
-        /*
-        // 社内Mavenリポジトリの場合
         uploadArchives {
 
             repositories.mavenDeployer {
+
+                // ローカルのMavenリポジトリ
+                repository(url: innerMavenRepoUrl)
+
                 configuration = configurations.deployerJars
 
-                repository(url: "scp://repos.mycompany.com/releases") {
-                    authentication(userName: "me", password: "myPassword")
+                // 社内Mavenリポジトリ
+                if(!innerMavenRepoUploadUrl.isEmpty) {
+                    repository(url: innerMavenRepoUploadUrl) {
+                        authentication(userName: innerMavenRepoUser, password: innerMavenRepoPassword)
+                    }
                 }
             }
         }
-        */
     }
 }
