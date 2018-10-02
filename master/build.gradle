@@ -15,7 +15,7 @@ allprojects {
     repositories {
         mavenCentral()
         mavenLocal()
-        repository(url: innerMavenRepoUrl)
+        maven { url innerMavenRepoUrl }
     }
 }
 
