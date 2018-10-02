@@ -3,8 +3,14 @@ plugins {
   id 'com.github.spotbugs' version '1.6.4'
 }
 
+ext{
+    localWebServerRootDir = file('web-server')
+}
+
 // 全プロジェクト共通
 allprojects {
+
+
 
     tasks.withType(JavaCompile){ options.encoding = 'UTF-8' }
 

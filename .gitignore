@@ -35,3 +35,8 @@ pom.xml
 ################
 .gradle
 build
+
+################
+#  Local Web Server
+################
+!web-server

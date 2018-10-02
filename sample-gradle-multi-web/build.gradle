@@ -6,6 +6,9 @@ plugins {
 }
 
 ext {
+    localWebServerHome =  new File(localWebServerRootDir, webServerHome)
+    localWebServerLibDir = new File(localWebServerHome, webServerLibDir)
+
     jacocoAgentVersion = '0.8.2'
 }
 
@@ -16,7 +19,7 @@ dependencies {
     testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.14.0'
     testCompile group: 'org.jacoco', name: 'org.jacoco.agent', version: jacocoAgentVersion
 
-    providedCompile fileTree(dir: "$localServerHome/modules/system/layers/base", include: '**/*.jar')
+    providedCompile fileTree(dir: localWebServerLibDir, include: '**/*.jar')
 
     def cargoVersion = '1.4.5'
     cargo "org.codehaus.cargo:cargo-core-uberjar:$cargoVersion",
@@ -46,7 +49,7 @@ cargo {
     local {
         // タスク：clean assemble cargoStopLocal cargoStartLocal
         // タスク：clean assemble cargoRedeployLocal
-        homeDir = file(localServerHome) // プロジェクト内にサーバがあることを想定
+        homeDir = localWebServerHome // プロジェクト内にサーバがあることを想定
         timeout = 60000
 
         def jacocoAagentJar =  fileTree(dir: gradle.gradleUserHomeDir, include: "**/org.jacoco.agent-$jacocoAgentVersion" + '.jar')[0].path
