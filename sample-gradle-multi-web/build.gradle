@@ -5,11 +5,16 @@ plugins {
   id "com.bmuschko.cargo" version "2.4"
 }
 
+ext {
+    jacocoAgentVersion = '0.8.2'
+}
+
 dependencies {
 
-    compile project(':sample-gradle-multi-shared')
+    compile group: 'sample.gradle.multi', name: 'sample-gradle-multi-shared', version: version
 
     testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.14.0'
+    testCompile group: 'org.jacoco', name: 'org.jacoco.agent', version: jacocoAgentVersion
 
     providedCompile fileTree(dir: "$localServerHome/modules/system/layers/base", include: '**/*.jar')
 
@@ -43,6 +48,9 @@ cargo {
         // タスク：clean assemble cargoRedeployLocal
         homeDir = file(localServerHome) // プロジェクト内にサーバがあることを想定
         timeout = 60000
+
+        def jacocoAagentJar =  fileTree(dir: gradle.gradleUserHomeDir, include: "**/org.jacoco.agent-$jacocoAgentVersion" + '.jar')[0].path
+        jvmArgs = "-javaagent:$jacocoAagentJar=destfile=$reportsDir/jacoco/jacoco.exec"
     }
 
     remote {
