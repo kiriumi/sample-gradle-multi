@@ -1,6 +1,7 @@
 plugins {
   id 'org.hidetake.ssh' version '2.9.0'
   id 'com.github.spotbugs' version '1.6.4'
+  id 'org.flywaydb.flyway' version '5.1.4'
 }
 
 ext{
@@ -13,6 +14,8 @@ ext{
 // 全プロジェクト共通
 allprojects {
 
+    apply plugin: 'java'
+
     tasks.withType(JavaCompile){ options.encoding = 'UTF-8' }
 
     repositories {
@@ -20,16 +23,21 @@ allprojects {
         mavenLocal()
         maven { url innerMavenRepoUrl }
     }
+
+    // 依存関係
+    dependencies {
+        compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    }
 }
 
 // サブプロジェクト共通
 subprojects{
 
-    apply plugin: 'java'
     apply plugin: 'maven'
     apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
     apply plugin: 'com.github.spotbugs'
+    apply plugin: 'org.flywaydb.flyway'
 
     group = 'sample.gradle.multi'
     version = branchName + '.' + environment
@@ -41,6 +49,7 @@ subprojects{
     dependencies {
 
         compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
         compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
 
         testCompile group: 'junit', name: 'junit', version: '4.12'
@@ -74,7 +83,25 @@ subprojects{
             destinationFile = file("$reportsDir/jacoco/jacoco.exec")
         }
     }
+}
 
+flyway {
+
+    def subprojectSqlDir = []
+
+    subprojects.each { subproject ->
+        subprojectSqlDir.add('filesystem:' + new File(subproject.projectDir, 'sql').path)
+    }
+
+    driver = 'org.postgresql.Driver'
+    url = 'jdbc:postgresql://localhost:5432/spring_batch_db'
+    user = 'springrole'
+    password = 'springrole'
+    schemas = ['flyway1', 'flyway2']
+
+    locations = subprojectSqlDir
+    sqlMigrationPrefix = ''
+    sqlMigrationSeparator = '_'
 }
 
 apply from: 'build-shared.gradle'
