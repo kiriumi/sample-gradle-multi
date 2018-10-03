@@ -5,6 +5,9 @@ plugins {
 
 ext{
     localWebServerRootDir = file('web-server')
+    configDir = file('config')
+    configCheckstyleDir = file('config/checkstyle')
+    configJacocoDir= file('config/jacoco')
 }
 
 // 全プロジェクト共通

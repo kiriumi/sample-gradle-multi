@@ -1,5 +1,7 @@
 package logic;
 
+import static org.junit.Assert.*;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +28,7 @@ public class LoginBeanTest {
     public void test() {
         driver.get("http://localhost:8080/SampleWebApp/login.xhtml");
         driver.quit();
+        assertEquals("1", "1");
     }
 
 }
