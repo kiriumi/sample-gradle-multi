@@ -34,6 +34,11 @@ allprojects {
 
     tasks.withType(JavaCompile){ options.encoding = 'UTF-8' }
 
+    configurations.all {
+        // 依存関係のあるJarに「changing = true」を付けると、ローカルにキャッシュしなくなる
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+
     repositories {
         mavenCentral()
         mavenLocal()
