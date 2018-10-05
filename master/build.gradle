@@ -41,6 +41,7 @@ allprojects {
 }
 
 // サブプロジェクト共通
+// ※JDBCの依存関係はDBマイグレーションのGradleスクリプトで定義すること
 subprojects{
 
     group = 'sample.gradle.multi'
