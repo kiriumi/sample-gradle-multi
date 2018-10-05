@@ -1,0 +1,20 @@
+apply plugin: 'org.flywaydb.flyway'
+
+// DBマイグレーション
+flyway {
+
+    def dbMigreDirs = []
+    subprojects.each { subproject ->
+        dbMigreDirs.add('filesystem:' + new File(subproject.projectDir, dbMigreDir).path)
+    }
+
+    driver = jdbcDriver
+    url = jdbcUrl
+    user = jdbcUser
+    password = jdbcPassword
+
+    schemas = dbMigreSchemas.split()
+    locations = dbMigreDirs
+    sqlMigrationPrefix = ''
+    sqlMigrationSeparator = '_'
+}

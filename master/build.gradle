@@ -37,7 +37,6 @@ subprojects{
     apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
     apply plugin: 'com.github.spotbugs'
-    apply plugin: 'org.flywaydb.flyway'
 
     group = 'sample.gradle.multi'
     version = branchName + '.' + environment
@@ -85,24 +84,6 @@ subprojects{
     }
 }
 
-flyway {
-
-    def subprojectSqlDir = []
-
-    subprojects.each { subproject ->
-        subprojectSqlDir.add('filesystem:' + new File(subproject.projectDir, 'sql').path)
-    }
-
-    driver = 'org.postgresql.Driver'
-    url = 'jdbc:postgresql://localhost:5432/spring_batch_db'
-    user = 'springrole'
-    password = 'springrole'
-    schemas = ['flyway1', 'flyway2']
-
-    locations = subprojectSqlDir
-    sqlMigrationPrefix = ''
-    sqlMigrationSeparator = '_'
-}
-
+apply from: 'db-migration.gradle'
 apply from: 'build-shared.gradle'
-apply from: 'deploy-batch.gradle'
+//apply from: 'deploy-batch.gradle'
