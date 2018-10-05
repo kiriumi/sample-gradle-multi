@@ -6,10 +6,6 @@
  apply plugin: 'java'
 
 ext {
-    // バッチプロジェクト
-    batchProjects  = ['sample-gradle-multi-shared', 'sample-gradle-multi-app']
-    batchBizProjects = ['sample-gradle-multi-app']
-
     // マスタープロジェクトに集約する配布リソース情報
     masterDistsDir = "${distsDir}/${deployRootDir}"
     distFilename = String.format("${deployRootDir}-%s.zip", new Date().format('yyyyMMdd'))
