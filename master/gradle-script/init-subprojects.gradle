@@ -48,7 +48,7 @@ subprojects {
 
         // 各環境の外部リソースのディレクトリ
         envAfterUt.each { env ->
-             makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${shellDir}_{$env}"))
+             makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${shellDir}_${env}"))
              makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${confDir}_${env}"))
         }
     }
