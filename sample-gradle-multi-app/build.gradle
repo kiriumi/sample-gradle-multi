@@ -1,4 +1,3 @@
 dependencies {
-    //compile project(':sample-gradle-multi-shared')
-    compile group: 'sample.gradle.multi', name: 'sample-gradle-multi-shared', version: version
+    compile project(':sample-gradle-multi-shared')
 }

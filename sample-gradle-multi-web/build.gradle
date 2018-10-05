@@ -12,7 +12,7 @@ ext {
 
 dependencies {
 
-    compile group: 'sample.gradle.multi', name: 'sample-gradle-multi-shared', version: version
+    compile project(':sample-gradle-multi-shared')
 
     testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.14.0'
     testCompile group: 'org.jacoco', name: 'org.jacoco.agent', version: '0.8.2'
