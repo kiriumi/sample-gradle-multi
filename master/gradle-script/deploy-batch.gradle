@@ -12,6 +12,7 @@ ext {
 
     masterDistsDir = "$distsDir/$deployRootDir"
 
+    // デプロイ対象リソース
     def none = ['none']
     includeShells = deployShells.trim().isEmpty() ? none : deployShells.split()
     includeConfs = deployConfs.trim().isEmpty() ? none : deployConfs.split()
