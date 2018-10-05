@@ -1,23 +1,35 @@
+// 外部プラグインの適用
 plugins {
-  id 'org.hidetake.ssh' version '2.9.0'
   id 'com.github.spotbugs' version '1.6.4'
   id 'org.flywaydb.flyway' version '5.1.4'
+  id 'org.hidetake.ssh' version '2.9.0'
 }
 
-apply from: 'build-shared.gradle'
-//apply from: 'deploy-batch.gradle'
-
+// 拡張プロパティ
 ext{
-    localWebServerRootDir = file('web-server')
+    // 設定ディレクトリ
     configDir = file('config')
     configCheckstyleDir = file('config/checkstyle')
     configJacocoDir= file('config/jacoco')
+
+    // ローカルWebサーバのルートディレクトリ
+    localWebServerRootDir = file('web-server')
+
+    // flywayのタスククラス
+    // ※拡張プロパティを通さないと、外部Gradleスクリプト側でクラスと認識されない
+    flywayCleanTask = org.flywaydb.gradle.task.FlywayCleanTask
+    flywayMigrateTask = org.flywaydb.gradle.task.FlywayMigrateTask
 }
+
+// 外部Gradleスクリプトの適用
+def gradleScriptDir = 'gradle-script'
+apply from: "$gradleScriptDir/db-migration.gradle"
+apply from: "$gradleScriptDir/build-shared.gradle"
+apply from: "$gradleScriptDir/test.gradle"
+//apply from: "$gradleScriptDir/deploy-batch.gradle"
 
 // 全プロジェクト共通
 allprojects {
-
-    apply plugin: 'java'
 
     tasks.withType(JavaCompile){ options.encoding = 'UTF-8' }
 
@@ -26,19 +38,10 @@ allprojects {
         mavenLocal()
         maven { url innerMavenRepoUrl }
     }
-
-    // 依存関係
-    dependencies {
-        compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
-    }
 }
 
 // サブプロジェクト共通
 subprojects{
-
-    apply plugin: 'checkstyle'
-    apply plugin: 'jacoco'
-    apply plugin: 'com.github.spotbugs'
 
     group = 'sample.gradle.multi'
     version = branchName + '.' + environment
@@ -55,77 +58,5 @@ subprojects{
 
         // 外部リソースのクラスパス
         runtime files("$deployRootDir/$confDir")
-    }
-}
-
-// テスト
-subprojects{
-
-    apply plugin: 'checkstyle'
-    apply plugin: 'com.github.spotbugs'
-    apply plugin: 'jacoco'
-
-    // 依存関係
-    dependencies {
-
-        testCompile group: 'junit', name: 'junit', version: '4.12'
-        testCompile group: 'org.dbunit', name: 'dbunit', version: '2.5.4'
-        testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.18.0'
-    }
-
-    checkstyle {
-        configFile = new File(configDir,  'sun_checks.xml')
-        ignoreFailures = true
-    }
-
-    checkstyleTest.excludes = ['**/*']
-
-    spotbugs {
-        ignoreFailures = true
-    }
-
-    spotbugsTest.excludes = ['**/*']
-
-    test {
-        jacoco {
-            append = false
-            destinationFile = file("$reportsDir/jacoco/jacoco.exec")
-        }
-    }
-}
-
-// DBマイグレーション
-allprojects {
-
-    apply plugin: 'org.flywaydb.flyway'
-
-    // 依存関係
-    dependencies {
-        compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
-    }
-}
-
-task cleanDb(type: org.flywaydb.gradle.task.FlywayCleanTask) {
-
-    driver = jdbcDriver
-    url = jdbcUrl
-    user = jdbcUser
-    password = jdbcPassword
-    schemas = [ jdbcSchema ]
-}
-
-subprojects {
-
-    task migrateDb(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
-
-        driver = jdbcDriver
-        url = jdbcUrl
-        user = jdbcUser
-        password = jdbcPassword
-        schemas = [ jdbcSchema ]
-        locations = [ "filesystem:$projectDir/$dbMigreSqlDir" ]
-        sqlMigrationPrefix = dbMigreSqlPrefix
-
-        outOfOrder = true
     }
 }

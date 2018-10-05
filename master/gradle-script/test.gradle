@@ -1,0 +1,37 @@
+
+// テスト
+subprojects{
+
+    apply plugin: 'checkstyle'
+    apply plugin: 'com.github.spotbugs'
+    apply plugin: 'jacoco'
+
+    // 依存関係
+    dependencies {
+
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+        testCompile group: 'org.dbunit', name: 'dbunit', version: '2.5.4'
+        testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.18.0'
+    }
+
+    checkstyle {
+        configFile = new File(configDir,  'sun_checks.xml')
+        ignoreFailures = true
+    }
+
+    checkstyleTest.excludes = ['**/*']
+
+    spotbugs {
+        ignoreFailures = true
+    }
+
+    spotbugsTest.excludes = ['**/*']
+
+    test {
+        jacoco {
+            append = false
+            destinationFile = file("$reportsDir/jacoco/jacoco.exec")
+        }
+    }
+}
+

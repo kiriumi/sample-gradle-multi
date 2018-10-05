@@ -1,0 +1,36 @@
+// DBマイグレーション
+allprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'org.flywaydb.flyway'
+
+    // 依存関係
+    dependencies {
+        compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    }
+}
+
+task cleanDb(type: flywayCleanTask) {
+
+    driver = jdbcDriver
+    url = jdbcUrl
+    user = jdbcUser
+    password = jdbcPassword
+    schemas = [ jdbcSchema ]
+}
+
+subprojects {
+
+    task migrateDb(type: flywayMigrateTask) {
+
+        driver = jdbcDriver
+        url = jdbcUrl
+        user = jdbcUser
+        password = jdbcPassword
+        schemas = [ jdbcSchema ]
+        locations = [ "filesystem:$projectDir/$dbMigreSqlDir" ]
+        sqlMigrationPrefix = dbMigreSqlPrefix
+
+        outOfOrder = true
+    }
+}
