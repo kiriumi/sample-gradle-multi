@@ -1,20 +1,54 @@
+ext {
+    packagePath = groupId.replace('.', '/')
+}
+
 subprojects {
 
-    task createDirs << {
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+
+    // ソースディレクトリの作成
+    task makeSourceDir << {
+
+        // javaのソースディレクトリ作成（パッケージを含む）
+        def makePackages = { javaSet ->
+            javaSet.srcDirs.each { sourceDir ->
+                makeDirIfNotExist(new File(sourceDir, packagePath))
+            }
+        }
+
+        // resoucesのソースディレクトリ作成
+        def makeResourceDir = { resourceSet ->
+            resourceSet.srcDirs.each { sourceDir ->
+                makeDirIfNotExist(sourceDir)
+            }
+        }
+
+        makePackages sourceSets.main.java
+        makeResourceDir sourceSets.main.resources
+        makePackages sourceSets.test.java
+        makeResourceDir sourceSets.test.resources
+    }
+
+    task makeDirs << {
 
         // DBマイグレーションSQLのディレクトリ
-        new File(projectDir, dbMigreSqlDir).mkdirs()
+        makeDirIfNotExist(new File(projectDir, dbMigreSqlDir))
 
         // 外部リソースのディレクトリ
-        new File(projectDir, "$deployRootDir/$shellDir").mkdirs()
-        new File(projectDir, "$deployRootDir/$confDir").mkdirs()
+        makeDirIfNotExist(new File(projectDir, "$deployRootDir/$shellDir"))
+        makeDirIfNotExist(new File(projectDir, "$deployRootDir/$confDir"))
 
         // 各環境の外部リソースのディレクトリ
         environments.split().each { env ->
-             new File(projectDir, "$deployRootDir/$shellDir" + "_$env").mkdirs()
-             new File(projectDir, "$deployRootDir/$confDir" + "_$env").mkdirs()
+             makeDirIfNotExist(new File(projectDir, "$deployRootDir/$shellDir" + "_$env"))
+             makeDirIfNotExist(new File(projectDir, "$deployRootDir/$confDir" + "_$env"))
         }
     }
 
-    task initSubrojects(dependsOn: createDirs)
+    task initSubrojects(dependsOn: [makeSourceDir, makeDirs])
+}
+
+private makeDirIfNotExist(File dir) {
+     if(!dir.exists()) { dir.mkdirs() }
 }

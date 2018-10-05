@@ -45,7 +45,7 @@ allprojects {
 // ※JDBCの依存関係はDBマイグレーションのGradleスクリプトで定義すること
 subprojects{
 
-    group = 'sample.gradle.multi'
+    group = groupId
     version = branchName + '.' + environment
 
     sourceCompatibility = '1.8'
