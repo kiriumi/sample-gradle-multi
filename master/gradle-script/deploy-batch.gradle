@@ -10,7 +10,9 @@ ext {
     batchProjects  = ['sample-gradle-multi-shared', 'sample-gradle-multi-app']
     batchBizProjects = ['sample-gradle-multi-app']
 
+    // マスタープロジェクトに集約する配布リソース情報
     masterDistsDir = "${distsDir}/${deployRootDir}"
+    distFilename = String.format("${deployRootDir}-%s.zip", new Date().format('yyyyMMdd'))
 
     // デプロイ対象リソース
     def none = ['none']
@@ -86,14 +88,14 @@ batchBizProjects.each { batchBizProject ->
 
 // 配布リソースを圧縮
 task zipDists(type: Zip)  {
-    archiveName = String.format("${deployRootDir}-%s.zip", new Date().format('yyyyMMdd'));
+    archiveName = distFilename
     from masterDistsDir
 }
 
 // サーバ接続情報
 remotes {
 
-    transpoter {
+    transferer {
         host = deployHost
         user = deployUser
         password = deployPassword
@@ -113,29 +115,38 @@ ssh.settings {
 }
 
 // デプロイ
-task deploy << {
+task deployBatch << {
 
     def deployWorkDir = '/WORK/deploy'
 
     ssh.run {
 
-        session(remotes.transpoter)  {
+        session(remotes.transferer)  {
 
-            //execute("mkdir -p -m $modeDir $deployWorkDir") // 作業ディレクトリ作成
-            //put from: deployWorkDir, into: deployWorkDir // サーバ転送
-            // unzip // 解凍
+            // 作業ディレクトリをクリーン
+            execute("rm -rf ${deployWorkDir}/*")
+            execute("mkdir -p -m ${modeDir} ${deployWorkDir}")
 
+            // 配布リソースを転送し、解凍
+            put from: "${distsDir}/${distFilename}", into: deployWorkDir
+            execute("unzip -o ${deployWorkDir}/${distFilename} -d ${deployWorkDir}")
         }
 
         session(remotes.deployer)  {
 
-            //execute("rm -rf ") // 過去バージョンのJarを削除
-            //execute("cp -ra $deployRootDir") // デプロイ
+            // 他バージョンのJarを削除
+            includeJars.each{ targetJar -> execute("rm -f ${deployRootDir}/${jarDir}/${targetJar}") }
+            includeDependencies.each{ targetJar -> execute("rm -f ${deployRootDir}/${dependenciesDir}/${targetJar}") }
+
+            // デプロイ
+            execute("cp -ra ${deployWorkDir}/${deployRootDir} ${deployRootDir}") // デプロイ
 
             // 権限変更
-            execute("chmod ${modeShell} ${deployRootDir}/${shellDir}")
-            execute("chmod ${modeConf} ${deployRootDir}/${confDir}")
-            execute("chmod ${modeArchive} ${deployRootDir}/${jarDir}")
+            def resourceOwner = remotes.deployer.user
+            execute("find ${deployRootDir}/${shellDir} ${deployRootDir}/${confDir} ${deployRootDir}/${jarDir} -type d -user ${resourceOwner} | xargs chmod ${modeDir}")
+            execute("find ${deployRootDir}/${shellDir} -type f -user ${resourceOwner} | xargs chmod ${modeShell}")
+            execute("find ${deployRootDir}/${confDir} -type f -user ${resourceOwner} | xargs chmod ${modeConf}")
+            execute("find ${deployRootDir}/${jarDir} -type f -user ${resourceOwner} | xargs chmod ${modeJar}")
         }
     }
 }
