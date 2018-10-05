@@ -43,13 +43,13 @@ subprojects {
         makeDirIfNotExist(new File(projectDir, dbMigreSqlDir))
 
         // 外部リソースのディレクトリ
-        makeDirIfNotExist(new File(projectDir, "$deployRootDir/$shellDir"))
-        makeDirIfNotExist(new File(projectDir, "$deployRootDir/$confDir"))
+        makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${shellDir}"))
+        makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${confDir}"))
 
         // 各環境の外部リソースのディレクトリ
-        envAfterUt.split().each { env ->
-             makeDirIfNotExist(new File(projectDir, "$deployRootDir/$shellDir" + "_$env"))
-             makeDirIfNotExist(new File(projectDir, "$deployRootDir/$confDir" + "_$env"))
+        envAfterUt.each { env ->
+             makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${shellDir}_{$env}"))
+             makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${confDir}_${env}"))
         }
     }
 

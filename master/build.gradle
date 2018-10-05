@@ -9,8 +9,8 @@ plugins {
 ext{
     // 設定ディレクトリ
     masterResourcesDir = file('resources')
-    checkstyleDir = file("$masterResourcesDir/checkstyle")
-    jacocoDir= file("$masterResourcesDir/jacoco")
+    checkstyleDir = file("$masterResourcesDir}/checkstyle")
+    jacocoDir= file("${masterResourcesDir}/jacoco")
 
     // ローカルWebサーバのルートディレクトリ
     localWebServerRootDir = file('web-server')
@@ -23,11 +23,11 @@ ext{
 
 // 外部Gradleスクリプトの適用
 def gradleScriptDir = 'gradle-script'
-apply from: "$gradleScriptDir/init-subprojects.gradle" // サブプロジェクトの初期化
-apply from: "$gradleScriptDir/db-migration.gradle" // DBマイグレーション
-apply from: "$gradleScriptDir/build-shared.gradle" // 共有プロジェクトのビルド
-apply from: "$gradleScriptDir/test.gradle" // テスト
-apply from: "$gradleScriptDir/deploy-batch.gradle" // デプロイ
+apply from: "${gradleScriptDir}/init-subprojects.gradle" // サブプロジェクトの初期化
+apply from: "${gradleScriptDir}/db-migration.gradle" // DBマイグレーション
+apply from: "${gradleScriptDir}/build-shared.gradle" // 共有プロジェクトのビルド
+apply from: "${gradleScriptDir}/test.gradle" // テスト
+apply from: "${gradleScriptDir}/deploy-batch.gradle" // デプロイ
 
 // 全プロジェクト共通
 allprojects {
@@ -59,6 +59,6 @@ subprojects{
         compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
 
         // 外部リソースのクラスパス
-        runtime files("$deployRootDir/$confDir")
+        runtime files("${deployRootDir}/${confDir}")
     }
 }

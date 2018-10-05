@@ -18,7 +18,7 @@ subprojects{
     }
 
     checkstyle {
-        configFile = new File(checkstyleDir,  'sun_checks.xml')
+        configFile = file("${checkstyleDir}/${checkstyleConfigFile}")
         ignoreFailures = true
     }
 
@@ -33,7 +33,7 @@ subprojects{
     test {
         jacoco {
             append = false
-            destinationFile = file("$reportsDir/jacoco/jacoco.exec")
+            destinationFile = file("${reportsDir}/jacoco/jacoco.exec")
         }
     }
 }

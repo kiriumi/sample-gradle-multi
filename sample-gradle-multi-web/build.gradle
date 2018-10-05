@@ -20,8 +20,8 @@ dependencies {
     providedCompile fileTree(dir: localWebServerLibDir, include: '**/*.jar')
 
     def cargoVersion = '1.4.5'
-    cargo "org.codehaus.cargo:cargo-core-uberjar:$cargoVersion",
-          "org.codehaus.cargo:cargo-ant:$cargoVersion"
+    cargo "org.codehaus.cargo:cargo-core-uberjar:${cargoVersion}",
+          "org.codehaus.cargo:cargo-ant:${cargoVersion}"
 }
 
 eclipse {
@@ -52,8 +52,8 @@ cargo {
 
         // jacocoAgentVersion = '0.8.2'
         //def jacocoAagentJar =  fileTree(dir: gradle.gradleUserHomeDir, include: "**/org.jacoco.agent-$jacocoAgentVersion" + '.jar')[0].path
-        def jacocoAagentJar = new File(rootProject.projectDir , "$jacocoDir/jacocoagent.jar")
-        jvmArgs = "-javaagent:$jacocoAagentJar=destfile=$reportsDir/jacoco/jacoco.exec"
+        def jacocoAagentJar = new File(rootProject.projectDir , "${jacocoDir}/jacocoagent.jar}")
+        jvmArgs = "-javaagent:${jacocoAagentJar}=destfile=${reportsDir}/jacoco/jacoco.exec"
     }
 
     remote {

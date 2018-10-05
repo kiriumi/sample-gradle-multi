@@ -22,7 +22,7 @@ task cleanDb(type: flywayCleanTask) {
     url = jdbcUrl
     user = jdbcUser
     password = jdbcPassword
-    schemas = [ jdbcSchema ]
+    schemas = [jdbcSchema]
 }
 
 subprojects {
@@ -35,7 +35,7 @@ subprojects {
         user = jdbcUser
         password = jdbcPassword
         schemas = [ jdbcSchema ]
-        locations = [ "filesystem:$projectDir/$dbMigreSqlDir" ]
+        locations = [ "filesystem:${projectDir}/${dbMigreSqlDir}" ]
         sqlMigrationPrefix = dbMigreSqlPrefix
 
         outOfOrder = true

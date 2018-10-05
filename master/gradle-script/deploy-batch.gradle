@@ -10,14 +10,14 @@ ext {
     batchProjects  = ['sample-gradle-multi-shared', 'sample-gradle-multi-app']
     batchBizProjects = ['sample-gradle-multi-app']
 
-    masterDistsDir = "$distsDir/$deployRootDir"
+    masterDistsDir = "${distsDir}/${deployRootDir}"
 
     // デプロイ対象リソース
     def none = ['none']
     includeShells = deployShells.trim().isEmpty() ? none : deployShells.split()
     includeConfs = deployConfs.trim().isEmpty() ? none : deployConfs.split()
-    includeJars = deproyJars.trim().isEmpty() ? none : deproyJars.split().collect { "$it-*.jar" }
-    includeDependencies = deproyDependencies.trim().isEmpty() ? none : deproyDependencies.split().collect { "$it-*.jar" }
+    includeJars = deproyJars.trim().isEmpty() ? none : deproyJars.split().collect { "${it}-*.jar" }
+    includeDependencies = deproyDependencies.trim().isEmpty() ? none : deproyDependencies.split().collect { "${it}-*.jar" }
 
     isUt = environment == envUt
 }
@@ -26,9 +26,9 @@ def copyWithTimestamp = { batchProject, fromDir, intoDir , includes ->
 
     def surffix = file(intoDir).name
 
-    project( ":$batchProject") {
+    project( ":${batchProject}") {
 
-        task "copy$surffix"(type: Copy) {
+        task "copy${surffix}"(type: Copy) {
 
             from fromDir
 
@@ -57,27 +57,27 @@ def copyWithTimestamp = { batchProject, fromDir, intoDir , includes ->
 batchProjects.each { batchProject ->
 
     // シェルと設定ファイルをコピー
-    copyWithTimestamp(batchProject, "$deployRootDir/$shellDir", "$masterDistsDir/$shellDir", includeShells)
-    copyWithTimestamp(batchProject, "$deployRootDir/$confDir", "$masterDistsDir/$confDir", includeConfs)
+    copyWithTimestamp(batchProject, "${deployRootDir}/${shellDir}", "${masterDistsDir}/${shellDir}", includeShells)
+    copyWithTimestamp(batchProject, "$deployRootDir}/${confDir}", "${masterDistsDir}/${confDir}", includeConfs)
 }
 
 // 業務バッチプロジェクト
 batchBizProjects.each { batchBizProject ->
 
-    project( ":$batchBizProject") {
+    project( ":${batchBizProject}") {
 
         // Jarをコピー
-        task "copy$jarDir" << {
+        task "copy${jarDir}" << {
 
             copy {
                 from libsDir
-                into "$masterDistsDir/$jarDir"
+                into "${masterDistsDir}/${jarDir}"
                 include includeJars
             }
 
             copy {
                 from configurations.compile
-                into "$masterDistsDir/$dependenciesDir"
+                into "${masterDistsDir}/${dependenciesDir}"
                 include includeDependencies
             }
         }
@@ -86,7 +86,7 @@ batchBizProjects.each { batchBizProject ->
 
 // 配布リソースを圧縮
 task zipDists(type: Zip)  {
-    archiveName = String.format("$deployRootDir-%s.zip", new Date().format('yyyyMMdd'));
+    archiveName = String.format("${deployRootDir}-%s.zip", new Date().format('yyyyMMdd'));
     from masterDistsDir
 }
 
@@ -133,9 +133,9 @@ task deploy << {
             //execute("cp -ra $deployRootDir") // デプロイ
 
             // 権限変更
-            execute("chmod $modeShell $deployRootDir/$shellDir")
-            execute("chmod $modeConf $deployRootDir/$confDir")
-            execute("chmod $modeArchive $deployRootDir/$jarDir")
+            execute("chmod ${modeShell} ${deployRootDir}/${shellDir}")
+            execute("chmod ${modeConf} ${deployRootDir}/${confDir}")
+            execute("chmod ${modeArchive} ${deployRootDir}/${jarDir}")
         }
     }
 }

@@ -12,7 +12,7 @@
 // 共有プロジェクト共通
 sharedProjects.each { sharedProject ->
 
-    project( ":$sharedProject.name") {
+    project( ":${sharedProject.name}") {
 
         apply plugin: 'java'
         apply plugin: 'eclipse'
@@ -43,7 +43,7 @@ sharedProjects.each { sharedProject ->
 
         // 依存関係
         dependencies {
-            deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
+            deployerJars 'org.apache.maven.wagon:wagon-ssh:2.2'
         }
 
         uploadArchives {
