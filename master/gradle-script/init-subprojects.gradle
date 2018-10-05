@@ -1,3 +1,8 @@
+/*
+ * サブプロジェクトの初期化
+ * 実行タスク：initSubrojects, eclipse
+ *
+ */
 ext {
     packagePath = groupId.replace('.', '/')
 }
