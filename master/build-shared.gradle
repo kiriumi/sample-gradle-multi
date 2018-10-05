@@ -14,7 +14,9 @@ sharedProjects.each { sharedProject ->
 
     project( ":$sharedProject.name") {
 
+        apply plugin: 'java'
         apply plugin: 'eclipse'
+        apply plugin: 'maven'
 
         // ソースJar作成
         task sourcesJar(type: Jar) {

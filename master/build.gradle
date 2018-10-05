@@ -4,6 +4,9 @@ plugins {
   id 'org.flywaydb.flyway' version '5.1.4'
 }
 
+apply from: 'build-shared.gradle'
+//apply from: 'deploy-batch.gradle'
+
 ext{
     localWebServerRootDir = file('web-server')
     configDir = file('config')
@@ -33,7 +36,6 @@ allprojects {
 // サブプロジェクト共通
 subprojects{
 
-    apply plugin: 'maven'
     apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
     apply plugin: 'com.github.spotbugs'
@@ -51,12 +53,24 @@ subprojects{
         compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
         compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
 
-        testCompile group: 'junit', name: 'junit', version: '4.12'
-        testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.18.0'
-
-
         // 外部リソースのクラスパス
         runtime files("$deployRootDir/$confDir")
+    }
+}
+
+// テスト
+subprojects{
+
+    apply plugin: 'checkstyle'
+    apply plugin: 'com.github.spotbugs'
+    apply plugin: 'jacoco'
+
+    // 依存関係
+    dependencies {
+
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+        testCompile group: 'org.dbunit', name: 'dbunit', version: '2.5.4'
+        testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.18.0'
     }
 
     checkstyle {
@@ -64,17 +78,13 @@ subprojects{
         ignoreFailures = true
     }
 
-    checkstyleTest {
-        excludes = ['**/*']
-    }
+    checkstyleTest.excludes = ['**/*']
 
     spotbugs {
         ignoreFailures = true
     }
 
-    spotbugsTest {
-        excludes = ['**/*']
-    }
+    spotbugsTest.excludes = ['**/*']
 
     test {
         jacoco {
@@ -84,6 +94,38 @@ subprojects{
     }
 }
 
-apply from: 'db-migration.gradle'
-apply from: 'build-shared.gradle'
-//apply from: 'deploy-batch.gradle'
+// DBマイグレーション
+allprojects {
+
+    apply plugin: 'org.flywaydb.flyway'
+
+    // 依存関係
+    dependencies {
+        compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    }
+}
+
+task cleanDb(type: org.flywaydb.gradle.task.FlywayCleanTask) {
+
+    driver = jdbcDriver
+    url = jdbcUrl
+    user = jdbcUser
+    password = jdbcPassword
+    schemas = [ jdbcSchema ]
+}
+
+subprojects {
+
+    task migrateDb(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
+
+        driver = jdbcDriver
+        url = jdbcUrl
+        user = jdbcUser
+        password = jdbcPassword
+        schemas = [ jdbcSchema ]
+        locations = [ "filesystem:$projectDir/$dbMigreSqlDir" ]
+        sqlMigrationPrefix = dbMigreSqlPrefix
+
+        outOfOrder = true
+    }
+}
