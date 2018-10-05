@@ -5,6 +5,7 @@
  */
 ext {
     packagePath = groupId.replace('.', '/')
+    envAfterUt = environments.split() - [envUt]
 }
 
 subprojects {

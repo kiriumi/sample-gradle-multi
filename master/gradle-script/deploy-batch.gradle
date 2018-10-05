@@ -11,14 +11,19 @@ ext {
     batchBizProjects = ['sample-gradle-multi-app']
 
     masterDistsDir = "$distsDir/$deployRootDir"
+
+    def none = ['none']
+    includeShells = deployShells.trim().isEmpty() ? none : deployShells.split()
+    includeConfs = deployConfs.trim().isEmpty() ? none : deployConfs.split()
+    includeJars = deproyJars.trim().isEmpty() ? none : deproyJars.split().collect { "$it-*.jar" }
+    includeDependencies = deproyDependencies.trim().isEmpty() ? none : deproyDependencies.split().collect { "$it-*.jar" }
+
+    isUt = environment == envUt
 }
 
-def copyWithTimestamp = { batchProject, fromDir, intoDir ->
+def copyWithTimestamp = { batchProject, fromDir, intoDir , includes ->
 
     def surffix = file(intoDir).name
-
-    println batchProject
-
 
     project( ":$batchProject") {
 
@@ -28,10 +33,11 @@ def copyWithTimestamp = { batchProject, fromDir, intoDir ->
 
             if(!environment.equals('REL')) {
                 // 開発時は該当の面のシェルをコピー
-                from fromDir + '_' + environment
+                from "${fromDir}_${environment}"
             }
 
             into intoDir
+            include includes
 
             // 更新日時を維持する
             def copyDetails = []
@@ -50,8 +56,8 @@ def copyWithTimestamp = { batchProject, fromDir, intoDir ->
 batchProjects.each { batchProject ->
 
     // シェルと設定ファイルをコピー
-    copyWithTimestamp(batchProject, "$deployRootDir/$shellDir", "$masterDistsDir/$shellDir")
-    copyWithTimestamp(batchProject, "$deployRootDir/$confDir", "$masterDistsDir/$confDir")
+    copyWithTimestamp(batchProject, "$deployRootDir/$shellDir", "$masterDistsDir/$shellDir", includeShells)
+    copyWithTimestamp(batchProject, "$deployRootDir/$confDir", "$masterDistsDir/$confDir", includeConfs)
 }
 
 // 業務バッチプロジェクト
@@ -65,11 +71,13 @@ batchBizProjects.each { batchBizProject ->
             copy {
                 from libsDir
                 into "$masterDistsDir/$jarDir"
+                include includeJars
             }
 
             copy {
                 from configurations.compile
                 into "$masterDistsDir/$dependenciesDir"
+                include includeDependencies
             }
         }
     }
