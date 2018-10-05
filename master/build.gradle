@@ -27,7 +27,7 @@ apply from: "$gradleScriptDir/init-subprojects.gradle" // サブプロジェク�
 apply from: "$gradleScriptDir/db-migration.gradle" // DBマイグレーション
 apply from: "$gradleScriptDir/build-shared.gradle" // 共有プロジェクトのビルド
 apply from: "$gradleScriptDir/test.gradle" // テスト
-//apply from: "$gradleScriptDir/deploy-batch.gradle" // デプロイ
+apply from: "$gradleScriptDir/deploy-batch.gradle" // デプロイ
 
 // 全プロジェクト共通
 allprojects {

@@ -8,71 +8,77 @@
 ext {
     // バッチプロジェクト
     batchProjects  = ['sample-gradle-multi-shared', 'sample-gradle-multi-app']
-    batchBizProject = 'sample-gradle-multi-app'
-    distDirs = [shellDir, confDir]
+    batchBizProjects = ['sample-gradle-multi-app']
 
-    tempDistsDir = "$distsDir/$deployRootDir"
+    masterDistsDir = "$distsDir/$deployRootDir"
 }
 
-// バッチプロジェクト共通
-batchProjects.each { batchProject ->
+def copyWithTimestamp = { batchProject, fromDir, intoDir ->
+
+    def surffix = file(intoDir).name
+
+    println batchProject
+
 
     project( ":$batchProject") {
 
-        // 外部リソースをコピー
-        task copyDists << {
+        task "copy$surffix"(type: Copy) {
 
-            distDirs.each { targetDir ->
+            from fromDir
 
-                copy {
-                    from "$deployRootDir/$targetDir"
+            if(!environment.equals('REL')) {
+                // 開発時は該当の面のシェルをコピー
+                from fromDir + '_' + environment
+            }
 
-                    if(!environment.equals('REL')) {
-                        // 開発時は該当の面のシェルをコピー
-                        from "$deployRootDir/$targetDir" + '_' + environment
+            into intoDir
+
+            // 更新日時を維持する
+            def copyDetails = []
+            eachFile { copyDetails << it }
+            doLast {
+                    copyDetails.each { FileCopyDetails details ->
+                            def target = new File(destinationDir, details.path)
+                            if(target.exists()) { target.setLastModified(details.lastModified) }
                     }
-
-                    into "$distsDir/$targetDir"
-                }
             }
         }
     }
 }
 
-// 業務バッチプロジェクト
-project( ":$batchBizProject") {
+// バッチプロジェクト共通
+batchProjects.each { batchProject ->
 
-    // 業務バッチプロジェクトからJarをコピー
-    task copyJars << {
+    // シェルと設定ファイルをコピー
+    copyWithTimestamp(batchProject, "$deployRootDir/$shellDir", "$masterDistsDir/$shellDir")
+    copyWithTimestamp(batchProject, "$deployRootDir/$confDir", "$masterDistsDir/$confDir")
+}
 
-        copy {
-            from libsDir
-            into "$distsDir/$jarDir"
-        }
+   // 業務バッチプロジェクト
+batchBizProjects.each { batchBizProject ->
 
-        copy {
-            from configurations.compile
-            into "$distsDir/$jarDir/dependencies"
+    project( ":$batchBizProject") {
+
+        // Jarをコピー
+        task "copy$jarDir" << {
+
+            copy {
+                from libsDir
+                into "$masterDistsDir/$jarDir"
+            }
+
+            copy {
+                from configurations.compile
+                into "$masterDistsDir/$jarDir/dependencies"
+            }
         }
     }
 }
 
-// 全バッチプロジェクトのリソースをマスターにコピー
-task copyDistsToMaster <<  {
-
-    subprojects.each { subProject ->
-
-         copy {
-            from subProject.distsDir
-            into tempDistsDir
-        }
-    }
-}
-
-// 配布物を圧縮
-task zipDists(type: Zip, dependsOn: copyDistsToMaster)  {
-    archiveName = String.format('dists-%s.zip', new Date().format('yyyyMMdd'));
-    from tempDistsDir
+// 配布リソースを圧縮
+task zipDists(type: Zip)  {
+    archiveName = String.format("$deployRootDir-%s.zip", new Date().format('yyyyMMdd'));
+    from masterDistsDir
 }
 
 // サーバ接続情報
