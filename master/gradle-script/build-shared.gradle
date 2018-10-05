@@ -3,16 +3,10 @@
  * ・実行タスク：clean build afterBuild uploadArchives
  *
  */
- ext {
-     // 共有プロジェクト
-    sharedProjects = subprojects
-    sharedProjects.removeIf{ subproject -> return !subproject.name.contains('shared') }
- }
-
 // 共有プロジェクト共通
 sharedProjects.each { sharedProject ->
 
-    project( ":${sharedProject.name}") {
+    project( ":${sharedProject}") {
 
         apply plugin: 'java'
         apply plugin: 'eclipse'
