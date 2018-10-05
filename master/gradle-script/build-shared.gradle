@@ -1,6 +1,6 @@
 /*
  * 共有プロジェクトをビルドし、Mavenリポジトリにアップロードする
- * ・実行タスク：clean build sourcesJar javadocJar uploadArchives
+ * ・実行タスク：clean build afterBuild uploadArchives
  *
  */
  ext {
@@ -17,6 +17,16 @@ sharedProjects.each { sharedProject ->
         apply plugin: 'java'
         apply plugin: 'eclipse'
         apply plugin: 'maven'
+
+        // 設定
+        configurations {
+            deployerJars
+        }
+
+        // 依存関係
+        dependencies {
+            deployerJars 'org.apache.maven.wagon:wagon-ssh:2.2'
+        }
 
         // ソースJar作成
         task sourcesJar(type: Jar) {
@@ -36,15 +46,7 @@ sharedProjects.each { sharedProject ->
             archives javadocJar
         }
 
-        // 設定
-        configurations {
-            deployerJars
-        }
-
-        // 依存関係
-        dependencies {
-            deployerJars 'org.apache.maven.wagon:wagon-ssh:2.2'
-        }
+       task afterBuild(dependsOn: [javadoc, sourcesJar, javadocJar])
 
         uploadArchives {
 
