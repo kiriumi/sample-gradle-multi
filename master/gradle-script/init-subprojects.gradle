@@ -1,6 +1,6 @@
 /*
- * サブプロジェクトの初期化
- * 実行タスク：initSubrojects, eclipse
+ * サブプロジェクトを初期化する
+ * ・実行タスク：initSubrojects, eclipse
  *
  */
 ext {
@@ -35,6 +35,7 @@ subprojects {
         makeResourceDir sourceSets.test.resources
     }
 
+    // 各種ディレクトリの作成
     task makeDirs << {
 
         // DBマイグレーションSQLのディレクトリ

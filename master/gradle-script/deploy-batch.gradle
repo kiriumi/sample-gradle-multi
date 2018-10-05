@@ -1,6 +1,6 @@
 /*
  * バッチ関連のリソースをマスターに集約し、デプロイする
- * copyOuterResoucesToDists copyArchivesToDists zipDists
+ * ・実行タスク：copyOuterResoucesToDists copyArchivesToDists zipDists
  *
  */
  apply plugin: 'java'

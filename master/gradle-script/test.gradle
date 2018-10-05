@@ -1,5 +1,8 @@
-
-// テスト
+/*
+ * 各種テストを行う
+ * ・実行タスク：check
+ *
+ */
 subprojects{
 
     apply plugin: 'checkstyle'
@@ -34,4 +37,3 @@ subprojects{
         }
     }
 }
-

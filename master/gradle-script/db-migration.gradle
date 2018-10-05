@@ -1,4 +1,9 @@
-// DBマイグレーション
+/*
+ * DBマイグレーションを行う
+ * ・実行タスク：cleanDb migrateDb
+ *
+ */
+
 allprojects {
 
     apply plugin: 'java'
@@ -10,6 +15,7 @@ allprojects {
     }
 }
 
+// DBクリーン
 task cleanDb(type: flywayCleanTask) {
 
     driver = jdbcDriver
@@ -21,6 +27,7 @@ task cleanDb(type: flywayCleanTask) {
 
 subprojects {
 
+    // DBマイグレーション
     task migrateDb(type: flywayMigrateTask) {
 
         driver = jdbcDriver
