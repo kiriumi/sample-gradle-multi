@@ -1,0 +1,20 @@
+subprojects {
+
+    task createDirs << {
+
+        // DBマイグレーションSQLのディレクトリ
+        new File(projectDir, dbMigreSqlDir).mkdirs()
+
+        // 外部リソースのディレクトリ
+        new File(projectDir, "$deployRootDir/$shellDir").mkdirs()
+        new File(projectDir, "$deployRootDir/$confDir").mkdirs()
+
+        // 各環境の外部リソースのディレクトリ
+        environments.split().each { env ->
+             new File(projectDir, "$deployRootDir/$shellDir" + "_$env").mkdirs()
+             new File(projectDir, "$deployRootDir/$confDir" + "_$env").mkdirs()
+        }
+    }
+
+    task initSubrojects(dependsOn: createDirs)
+}

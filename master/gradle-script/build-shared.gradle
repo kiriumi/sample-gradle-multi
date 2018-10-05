@@ -6,7 +6,7 @@
  ext {
      // 共有プロジェクト
     sharedProjects = subprojects
-    sharedProjects.removeIf{ subProject -> return !subProject.name.contains('shared') }
+    sharedProjects.removeIf{ subproject -> return !subproject.name.contains('shared') }
  }
 
 // 共有プロジェクト共通
