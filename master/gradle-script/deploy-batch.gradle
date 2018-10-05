@@ -1,6 +1,6 @@
 /*
  * バッチ関連のリソースをマスターに集約し、デプロイする
- * ・実行タスク：copyOuterResoucesToDists copyArchivesToDists zipDists
+ * ・実行タスク：clean copy${shellDir} copy"{confDir} copy${jarDir} zipDists deployBatch
  *
  */
  apply plugin: 'java'

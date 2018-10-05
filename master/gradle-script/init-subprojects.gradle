@@ -1,6 +1,6 @@
 /*
  * サブプロジェクトを初期化する
- * ・実行タスク：initSubrojects, eclipse
+ * ・実行タスク：initSubrojects eclipse
  *
  */
 ext {
