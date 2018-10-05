@@ -2,14 +2,12 @@ plugins {
   id 'war'
   id 'eclipse-wtp'
   id 'jacoco'
-  id "com.bmuschko.cargo" version "2.4"
+  id 'com.bmuschko.cargo' version '2.4'
 }
 
 ext {
     localWebServerHome =  new File(localWebServerRootDir, webServerHome)
     localWebServerLibDir = new File(localWebServerHome, webServerLibDir)
-
-    jacocoAgentVersion = '0.8.2'
 }
 
 dependencies {
@@ -17,7 +15,7 @@ dependencies {
     compile group: 'sample.gradle.multi', name: 'sample-gradle-multi-shared', version: version
 
     testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.14.0'
-    testCompile group: 'org.jacoco', name: 'org.jacoco.agent', version: jacocoAgentVersion
+    testCompile group: 'org.jacoco', name: 'org.jacoco.agent', version: '0.8.2'
 
     providedCompile fileTree(dir: localWebServerLibDir, include: '**/*.jar')
 
@@ -52,7 +50,9 @@ cargo {
         homeDir = localWebServerHome // プロジェクト内にサーバがあることを想定
         timeout = 60000
 
-        def jacocoAagentJar =  fileTree(dir: gradle.gradleUserHomeDir, include: "**/org.jacoco.agent-$jacocoAgentVersion" + '.jar')[0].path
+        // jacocoAgentVersion = '0.8.2'
+        //def jacocoAagentJar =  fileTree(dir: gradle.gradleUserHomeDir, include: "**/org.jacoco.agent-$jacocoAgentVersion" + '.jar')[0].path
+        def jacocoAagentJar = new File(rootProject.projectDir , "$jacocoDir/jacocoagent.jar")
         jvmArgs = "-javaagent:$jacocoAagentJar=destfile=$reportsDir/jacoco/jacoco.exec"
     }
 

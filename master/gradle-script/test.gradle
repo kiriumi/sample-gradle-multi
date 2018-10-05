@@ -15,7 +15,7 @@ subprojects{
     }
 
     checkstyle {
-        configFile = new File(configDir,  'sun_checks.xml')
+        configFile = new File(checkstyleDir,  'sun_checks.xml')
         ignoreFailures = true
     }
 

@@ -8,9 +8,9 @@ plugins {
 // 拡張プロパティ
 ext{
     // 設定ディレクトリ
-    configDir = file('config')
-    configCheckstyleDir = file('config/checkstyle')
-    configJacocoDir= file('config/jacoco')
+    masterResourcesDir = file('resources')
+    checkstyleDir = file("$masterResourcesDir/checkstyle")
+    jacocoDir= file("$masterResourcesDir/jacoco")
 
     // ローカルWebサーバのルートディレクトリ
     localWebServerRootDir = file('web-server')
