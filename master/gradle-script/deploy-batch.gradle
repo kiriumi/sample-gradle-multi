@@ -54,7 +54,7 @@ batchProjects.each { batchProject ->
     copyWithTimestamp(batchProject, "$deployRootDir/$confDir", "$masterDistsDir/$confDir")
 }
 
-   // 業務バッチプロジェクト
+// 業務バッチプロジェクト
 batchBizProjects.each { batchBizProject ->
 
     project( ":$batchBizProject") {
@@ -69,7 +69,7 @@ batchBizProjects.each { batchBizProject ->
 
             copy {
                 from configurations.compile
-                into "$masterDistsDir/$jarDir/dependencies"
+                into "$masterDistsDir/$dependenciesDir"
             }
         }
     }
@@ -96,7 +96,6 @@ remotes {
         user = deployUser
         password = deployPassword
     }
-
 }
 
 // SSH共通設定　
