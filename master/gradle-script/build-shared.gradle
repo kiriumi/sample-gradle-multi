@@ -1,6 +1,6 @@
 /*
  * 共有プロジェクトをビルドし、Mavenリポジトリにアップロードする
- * ・実行タスク：clean build uploadArchives
+ * ・実行タスク：clean build sourcesJar javadocJar uploadArchives
  *
  */
  ext {
