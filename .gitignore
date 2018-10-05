@@ -40,3 +40,8 @@ build
 #  Local Web Server
 ################
 !web-server
+
+################
+#  Jacoco
+################
+!jacocoagent.jar
