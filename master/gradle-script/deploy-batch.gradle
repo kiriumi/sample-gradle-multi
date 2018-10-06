@@ -178,6 +178,21 @@ task copyDeploied (type: CopyExtended){
     presereveTimestamp()
 }
 
+// リソース削除
+task deleteDeploied {
+
+    ssh.run {
+
+        session(remotes.deployer)  {
+
+            deleteShells.sprlit().each{ execute("rm ${deployRootDir}/${shellDir}/${it}") }
+            deleteConfs.sprlit().each{ execute("rm ${deployRootDir}/${confDir}/${it}") }
+            deleteJars.sprlit().each{ execute("rm ${deployRootDir}/${jarDir}/${it}-*.jar") }
+            deleteDependencies.sprlit().each{ execute("rm ${deployRootDir}/${dependenciesDir}/${it}-*.jar") }
+        }
+    }
+}
+
 // デプロイリソースをSVNにコミット
 task commitDeploied(type: svnCommitTask, dependsOn: copyDeploied) {
     source <<  "${diffDeploiedDir}/${deployHost}"
