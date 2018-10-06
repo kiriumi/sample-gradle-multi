@@ -62,8 +62,8 @@ allprojects {
 // ※JDBCの依存関係はDBマイグレーションのGradleスクリプトで定義すること
 subprojects{
 
-    group = groupId
-    version = branchName + '.' + environment
+    group = "${baseGroupId}.${groupId}"
+    version = "${branchName}.${environment}"
 
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
@@ -78,4 +78,8 @@ subprojects{
         // 外部リソースのクラスパス
         runtime files("${deployRootDir}/${confDir}")
     }
+}
+
+public getGroup(def groupId) {
+
 }

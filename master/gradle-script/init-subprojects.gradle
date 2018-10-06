@@ -3,15 +3,18 @@
  * ・実行タスク：initSubrojects eclipse
  *
  */
-ext {
-    packagePath = groupId.replace('.', '/')
-    envAfterUt = environments.split() - [envUt]
-}
-
 subprojects {
 
     apply plugin: 'java'
     apply plugin: 'eclipse'
+
+    ext {
+        // パッケージのパス
+        packagePath = groupId.replace('.', '/')
+
+        // UT以外の環境名
+        envAfterUt = environments.split() - [envUt]
+    }
 
     // ソースディレクトリの作成
     task makeSourceDir << {
