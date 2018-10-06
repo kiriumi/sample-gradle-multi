@@ -16,6 +16,7 @@ ext{
     // SVNのタスククラス
     // ※拡張プロパティを通さないと、外部Gradleスクリプト側でクラスと認識されない
     svnCommitTask = at.bxm.gradleplugins.svntools.tasks.SvnCommit
+    svntTagTask = at.bxm.gradleplugins.svntools.tasks.SvnTag
 }
 
 // 外部Gradleスクリプトの適用

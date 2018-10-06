@@ -183,3 +183,9 @@ task commitDeploied(type: svnCommitTask, dependsOn: copyDeploied) {
     source <<  "${diffDeploiedDir}/${deployHost}"
     commitMessage = svnCommitDeploiedMessage
 }
+
+// デプロイ後にタグ付け
+task tagDeploied(type: svnTagTask) {
+    tagName = branchName
+    commitMessage = svnTagMessage
+}
