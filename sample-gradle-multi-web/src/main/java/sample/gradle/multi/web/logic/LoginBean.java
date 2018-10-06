@@ -60,7 +60,7 @@ public class LoginBean extends AbstractManagedBean {
     @Logging
     public void loginCheck() {
 
-        if (id.equals("test") && password.equals("test")) {
+        if (id.equals("id") && password.equals("password")) {
             isAuth = true;
         }
     }
@@ -68,7 +68,7 @@ public class LoginBean extends AbstractManagedBean {
     public String login() {
 
         if (isAuth) {
-            getFlash().put("loginSccessMessage", "ログインできましたの");
+            getFlash().put("loginSccessMessage", "ログインできました");
             return "loginSuccess.xhtml";
         }
 
@@ -77,8 +77,7 @@ public class LoginBean extends AbstractManagedBean {
 
     @Override
     public void init() {
-        setId("test");
-        setPassword("test");
+
     }
 
     public String getId() {

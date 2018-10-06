@@ -1,5 +1,8 @@
 package sample.gradle.multi.web.logic;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
 import java.io.File;
 
 import org.junit.After;
@@ -31,7 +34,16 @@ public class LoginBeanTest {
 
     @Test
     public void test() {
-        Selenide.open("https://www.google.co.jp/");
-        //Selenide.open("http://localhost:8080/SampleWebApp/login.xhtml");
+
+        Selenide.open("http://localhost:8080/SampleWebApp/login.xhtml");
+
+        Selenide.$("#id").setValue("id");
+        Selenide.$("#password").setValue("password");
+
+        Selenide.$("#button").click();
+
+        String success = Selenide.$("#success").getValue();
+
+        assertThat(success, is("成功"));
     }
 }

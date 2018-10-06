@@ -9,19 +9,19 @@
     <title>ログインページ</title>
 </h:head>
 <h:body>
-    <h:form>
+    <h:form prependId="false">
         <h:panelGrid columns="2">
+
             <h:outputLabel value="ID" />
-            <h:inputText value="#{loginBean.id}" />
+            <h:inputText id="id" value="#{loginBean.id}" />
 
             <h:outputLabel value="Password" />
-            <h:inputText value="#{loginBean.password}" />
+            <h:inputText id="password"  value="#{loginBean.password}" />
 
             <!-- actionLister：actionより前に実行される -->
-            <h:commandButton value="ログイン"
+            <h:commandButton id="button" value="ログイン"
                 actionListener="#{loginBean.loginCheck()}"
                 action="#{loginBean.login()}" />
-
 
         </h:panelGrid>
     </h:form>

@@ -5,9 +5,6 @@ ext{
     checkstyleDir = file("${masterResourcesDir}/checkstyle")
     jacocoDir= file("${masterResourcesDir}/jacoco")
 
-    // ローカルWebサーバのルートディレクトリ
-    localWebServerRootDir = file('web-server')
-
     // プロジェクト一覧
     sharedProjects = getProjectNames(sharedContainsStrs) // 共有プロジェクト
     batchProjects = getProjectNames(batchContainsStrs) // バッチプロジェクト

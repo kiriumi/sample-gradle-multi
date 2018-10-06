@@ -6,7 +6,7 @@ plugins {
 }
 
 ext {
-    localWebServerHome =  new File(localWebServerRootDir, webServerHome)
+    localWebServerHome = new File(rootProject.projectDir, "web-server/$webServerHome")
     localWebServerLibDir = new File(localWebServerHome, webServerLibDir)
 }
 
@@ -46,15 +46,20 @@ cargo {
     }
 
     local {
-        // タスク：clean assemble cargoStopLocal cargoStartLocal
+        // タスク：clean war cargoStartLocal check
         // タスク：clean assemble cargoRedeployLocal
         homeDir = localWebServerHome // プロジェクト内にサーバがあることを想定
-        timeout = 60000
+        timeout = 10000
 
         // jacocoAgentVersion = '0.8.2'
         //def jacocoAagentJar =  fileTree(dir: gradle.gradleUserHomeDir, include: "**/org.jacoco.agent-$jacocoAgentVersion" + '.jar')[0].path
-        def jacocoAagentJar = new File(rootProject.projectDir , "${jacocoDir}/jacocoagent.jar}")
-        jvmArgs = "-javaagent:${jacocoAagentJar}=destfile=${reportsDir}/jacoco/jacoco.exec"
+        def jacocoAagentJar = new File(rootProject.projectDir , "${jacocoDir}/jacocoagent.jar").path
+        def jacocoReport = new File(reportsDir, 'jacoco/jacoco.exec').path
+
+        jvmArgs = "-Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true "
+        //jvmArgs += "-javaagent:${jacocoAagentJar}=destfile=${jacocoReport},append=true"
+
+        println jvmArgs
     }
 
     remote {
