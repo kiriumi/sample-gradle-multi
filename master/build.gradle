@@ -1,8 +1,9 @@
 // 外部プラグインの適用
 plugins {
-  id 'com.github.spotbugs' version '1.6.4'
-  id 'org.flywaydb.flyway' version '5.1.4'
-  id 'org.hidetake.ssh' version '2.9.0'
+  id 'com.github.spotbugs' version '1.6.4' // 静的解析
+  id 'org.flywaydb.flyway' version '5.1.4' // DBマイグレーション
+  id 'org.hidetake.ssh' version '2.9.0' // SSH
+  id 'at.bxm.svntools' version '2.2.1' // SVN
 }
 
 // 拡張プロパティ

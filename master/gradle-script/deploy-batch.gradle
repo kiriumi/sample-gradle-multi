@@ -1,14 +1,18 @@
 /*
  * バッチ関連のリソースをマスターに集約し、デプロイする
- * ・実行タスク：clean copy${shellDir} copy"{confDir} copy${jarDir} zipDists deployBatch
+ * ・実行タスク：clean copShell copyConf copyJar deployBatch commitDeploied
  *
  */
  apply plugin: 'java'
+ apply plugin: 'org.hidetake.ssh'
+ apply plugin: 'at.bxm.svntools'
 
 ext {
     // マスタープロジェクトに集約する配布リソース情報
     masterDistsDir = "${distsDir}/${deployRootDir}"
     distFilename = String.format("${deployRootDir}-%s.zip", new Date().format('yyyyMMdd'))
+
+    // デプロイしたリソースの差分比較用ディレクトリ
     diffDeploiedDir= "${projectDir}/diff-deploied"
 
     // デプロイ対象リソース
@@ -18,7 +22,36 @@ ext {
     includeJars = deproyJars.trim().isEmpty() ? none : deproyJars.split().collect { "${it}-*.jar" }
     includeDependencies = deproyDependencies.trim().isEmpty() ? none : deproyDependencies.split().collect { "${it}-*.jar" }
 
-    isUt = environment == envUt
+    // 指定された環境がUTか判定
+    isUt = (environment == envUt)
+}
+
+// サーバ接続情報
+remotes {
+
+    transferer {
+        host = deployHost
+        user = deployUser
+        password = deployPassword
+
+    }
+
+    deployer {
+        host = deployHost
+        user = deployUser
+        password = deployPassword
+    }
+}
+
+// SSH共通設定　
+ssh.settings {
+    knownHosts = allowAnyHosts
+}
+
+// SVN接続情報
+svntools {
+    username = svnUser
+    password = svnPassword
 }
 
 // 拡張コピータスククラス
@@ -38,9 +71,8 @@ class CopyExtended extends Copy {
     }
 }
 
-// バッチプロジェクト共通
+// 各バッチプロジェクトのシェルと設定ファイルをマスターにコピー
 batchProjects.each { batchProject ->
-
 
     project( ":${batchProject}") {
 
@@ -72,7 +104,7 @@ batchProjects.each { batchProject ->
     }
 }
 
-// 業務バッチプロジェクト
+// 業務プロジェクトのJarをマスターにコピー
 batchBizProjects.each { batchBizProject ->
 
     project( ":${batchBizProject}") {
@@ -103,30 +135,8 @@ task zipDists(type: Zip)  {
     from masterDistsDir
 }
 
-// サーバ接続情報
-remotes {
-
-    transferer {
-        host = deployHost
-        user = deployUser
-        password = deployPassword
-
-    }
-
-    deployer {
-        host = deployHost
-        user = deployUser
-        password = deployPassword
-    }
-}
-
-// SSH共通設定　
-ssh.settings {
-    knownHosts = allowAnyHosts
-}
-
 // デプロイ
-task deployBatch << {
+task deployBatch(dependsOn: copyDeploied) << {
 
     ssh.run {
 
@@ -163,8 +173,14 @@ task deployBatch << {
 // デプロイリソースを、差分比較用ディレクトリにコピー
 task copyDeploied (type: CopyExtended){
 
-   // 配布リソースをdiffにコピー（更新日時も維持
+   // 配布リソースをdiffにコピー
     from "${distsDir}/${deployRootDir}"
     into "${diffDeploiedDir}/${deployHost}"
     presereveTimestamp()
+}
+
+// デプロイリソースをSVNにコミット
+task commitDeploied(type: at.bxm.gradleplugins.svntools.tasks.SvnCommit, dependsOn: copyDeploied) {
+    source <<  "${diffDeploiedDir}/${deployHost}"
+    commitMessage = svnCommitMessage
 }
