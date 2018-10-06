@@ -5,12 +5,11 @@
  */
 subprojects {
 
-    apply plugin: 'java'
     apply plugin: 'eclipse'
 
     ext {
         // パッケージのパス
-        packagePath = groupId.replace('.', '/')
+        packagePath = group.replace('.', '/')
 
         // UT以外の環境名
         envAfterUt = environments.split() - [envUt]

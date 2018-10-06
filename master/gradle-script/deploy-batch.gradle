@@ -3,7 +3,6 @@
  * ・実行タスク：clean copyShell copyConf copyJar deployBatch commitDeploied
  *
  */
- apply plugin: 'java'
  apply plugin: 'org.hidetake.ssh'
  apply plugin: 'at.bxm.svntools'
 

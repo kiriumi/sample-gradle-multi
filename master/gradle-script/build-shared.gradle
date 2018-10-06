@@ -8,8 +8,6 @@ sharedProjects.each { sharedProject ->
 
     project( ":${sharedProject}") {
 
-        apply plugin: 'java'
-        apply plugin: 'eclipse'
         apply plugin: 'maven'
 
         // 設定

@@ -33,16 +33,10 @@ ext{
     svnCommitTask = at.bxm.gradleplugins.svntools.tasks.SvnCommit
 }
 
-// 外部Gradleスクリプトの適用
-def gradleScriptDir = 'gradle-script'
-apply from: "${gradleScriptDir}/init-subprojects.gradle" // サブプロジェクトの初期化
-apply from: "${gradleScriptDir}/db-migration.gradle" // DBマイグレーション
-apply from: "${gradleScriptDir}/build-shared.gradle" // 共有プロジェクトのビルド
-apply from: "${gradleScriptDir}/test.gradle" // テスト
-apply from: "${gradleScriptDir}/deploy-batch.gradle" // デプロイ
-
 // 全プロジェクト共通
 allprojects {
+
+    apply plugin: 'java'
 
     tasks.withType(JavaCompile){ options.encoding = 'UTF-8' }
 
@@ -80,6 +74,11 @@ subprojects{
     }
 }
 
-public getGroup(def groupId) {
-
-}
+// 外部Gradleスクリプトの適用
+// ※プロジェクトの設定情報を読込み終わってから適用
+def gradleScriptDir = 'gradle-script'
+apply from: "${gradleScriptDir}/init-subprojects.gradle" // サブプロジェクトの初期化
+apply from: "${gradleScriptDir}/db-migration.gradle" // DBマイグレーション
+apply from: "${gradleScriptDir}/build-shared.gradle" // 共有プロジェクトのビルド
+apply from: "${gradleScriptDir}/test.gradle" // テスト
+apply from: "${gradleScriptDir}/deploy-batch.gradle" // デプロイ
