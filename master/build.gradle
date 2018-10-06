@@ -20,7 +20,7 @@ ext{
 
 // 外部Gradleスクリプトの適用
 def gradleScriptDir = 'gradle-script'
-apply from: "${gradleScriptDir}/common-config.gradle" // サブプロジェクトの初期化
+apply from: "${gradleScriptDir}/common-config.gradle" // プロジェクトの共通設定
 apply from: "${gradleScriptDir}/init-subprojects.gradle" // サブプロジェクトの初期化
 apply from: "${gradleScriptDir}/db-migration.gradle" // DBマイグレーション
 apply from: "${gradleScriptDir}/build-shared.gradle" // 共有プロジェクトのビルド

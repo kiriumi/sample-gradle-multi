@@ -9,11 +9,11 @@ ext{
     localWebServerRootDir = file('web-server')
 
     // プロジェクト一覧
-    sharedProjects = sharedProjectNames.split() // 共有プロジェクト
-    batchProjects = batchProjectNames.split() // バッチプロジェクト
-    onlineProjects = onlineProjectNames.split() // オンラインプロジェクト
-    batchBizProjects = batchProjects.findAll{ !sharedProjects.contains(it) } // 業務バッチプロジェクト
-    onlineBizProjects = onlineProjects.findAll{ !sharedProjects.contains(it) } // 業務オンラインプロジェクト
+    sharedProjects = getProjectNames(sharedContainsStrs) // 共有プロジェクト
+    batchProjects = getProjectNames(batchContainsStrs) // バッチプロジェクト
+    onlineProjects = getProjectNames(onlineContainsStrs) // オンラインプロジェクト
+    batchBizProjects = batchProjects - sharedProjects // 業務バッチプロジェクト
+    onlineBizProjects =  onlineProjects - sharedProjects // 業務オンラインプロジェクト
 }
 
 // 全プロジェクト共通
@@ -54,5 +54,15 @@ subprojects{
 
         // 外部リソースのクラスパス
         runtime files("${deployRootDir}/${confDir}")
+    }
+}
+
+// 対象のプロジェクト名一覧を取得
+def getProjectNames(containsStrs) {
+
+    return subprojects.name.findAll {
+
+        def projectName = it
+        containsStrs.split().any { projectName.contains(it) }
     }
 }
