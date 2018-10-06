@@ -1,6 +1,6 @@
 /*
  * バッチ関連のリソースをマスターに集約し、デプロイする
- * ・実行タスク：clean copShell copyConf copyJar deployBatch commitDeploied
+ * ・実行タスク：clean copyShell copyConf copyJar deployBatch commitDeploied
  *
  */
  apply plugin: 'java'
@@ -136,7 +136,7 @@ task zipDists(type: Zip)  {
 }
 
 // デプロイ
-task deployBatch(dependsOn: copyDeploied) << {
+task deployBatch(dependsOn: zipDists) << {
 
     ssh.run {
 
@@ -180,7 +180,7 @@ task copyDeploied (type: CopyExtended){
 }
 
 // デプロイリソースをSVNにコミット
-task commitDeploied(type: at.bxm.gradleplugins.svntools.tasks.SvnCommit, dependsOn: copyDeploied) {
+task commitDeploied(type: svnCommitTask, dependsOn: copyDeploied) {
     source <<  "${diffDeploiedDir}/${deployHost}"
-    commitMessage = svnCommitMessage
+    commitMessage = svnCommitDeploiedMessage
 }

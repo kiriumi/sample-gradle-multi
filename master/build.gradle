@@ -27,6 +27,10 @@ ext{
     // ※拡張プロパティを通さないと、外部Gradleスクリプト側でクラスと認識されない
     flywayCleanTask = org.flywaydb.gradle.task.FlywayCleanTask
     flywayMigrateTask = org.flywaydb.gradle.task.FlywayMigrateTask
+
+    // SVNのタスククラス
+    // ※拡張プロパティを通さないと、外部Gradleスクリプト側でクラスと認識されない
+    svnCommitTask = at.bxm.gradleplugins.svntools.tasks.SvnCommit
 }
 
 // 外部Gradleスクリプトの適用
