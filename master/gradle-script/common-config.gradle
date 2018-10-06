@@ -1,3 +1,21 @@
+// 拡張プロパティ
+ext{
+    // マスタープロジェクトのリソースディレクトリ
+    masterResourcesDir = file('resources')
+    checkstyleDir = file("${masterResourcesDir}/checkstyle")
+    jacocoDir= file("${masterResourcesDir}/jacoco")
+
+    // ローカルWebサーバのルートディレクトリ
+    localWebServerRootDir = file('web-server')
+
+    // プロジェクト一覧
+    sharedProjects = sharedProjectNames.split() // 共有プロジェクト
+    batchProjects = batchProjectNames.split() // バッチプロジェクト
+    onlineProjects = onlineProjectNames.split() // オンラインプロジェクト
+    batchBizProjects = batchProjects.findAll{ !sharedProjects.contains(it) } // 業務バッチプロジェクト
+    onlineBizProjects = onlineProjects.findAll{ !sharedProjects.contains(it) } // 業務オンラインプロジェクト
+}
+
 // 全プロジェクト共通
 allprojects {
 
