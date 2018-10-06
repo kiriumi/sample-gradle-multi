@@ -1,0 +1,40 @@
+// 全プロジェクト共通
+allprojects {
+
+    apply plugin: 'java'
+
+    tasks.withType(JavaCompile){ options.encoding = 'UTF-8' }
+
+    configurations.all {
+        // 依存関係のあるJarに「changing = true」を付けると、ローカルにキャッシュしなくなる
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven { url innerMavenRepoUrl }
+    }
+}
+
+// サブプロジェクト共通
+// ※JDBCの依存関係はDBマイグレーションのGradleスクリプトで定義すること
+subprojects{
+
+    group = "${baseGroupId}.${groupId}"
+    version = "${branchName}.${environment}"
+
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+
+    // 依存関係
+    dependencies {
+
+        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
+
+        // 外部リソースのクラスパス
+        runtime files("${deployRootDir}/${confDir}")
+    }
+}

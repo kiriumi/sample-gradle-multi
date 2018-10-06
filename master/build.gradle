@@ -33,50 +33,9 @@ ext{
     svnCommitTask = at.bxm.gradleplugins.svntools.tasks.SvnCommit
 }
 
-// 全プロジェクト共通
-allprojects {
-
-    apply plugin: 'java'
-
-    tasks.withType(JavaCompile){ options.encoding = 'UTF-8' }
-
-    configurations.all {
-        // 依存関係のあるJarに「changing = true」を付けると、ローカルにキャッシュしなくなる
-        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-    }
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-        maven { url innerMavenRepoUrl }
-    }
-}
-
-// サブプロジェクト共通
-// ※JDBCの依存関係はDBマイグレーションのGradleスクリプトで定義すること
-subprojects{
-
-    group = "${baseGroupId}.${groupId}"
-    version = "${branchName}.${environment}"
-
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
-
-    // 依存関係
-    dependencies {
-
-        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
-        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
-        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
-
-        // 外部リソースのクラスパス
-        runtime files("${deployRootDir}/${confDir}")
-    }
-}
-
 // 外部Gradleスクリプトの適用
-// ※プロジェクトの設定情報を読込み終わってから適用
 def gradleScriptDir = 'gradle-script'
+apply from: "${gradleScriptDir}/common-config.gradle" // サブプロジェクトの初期化
 apply from: "${gradleScriptDir}/init-subprojects.gradle" // サブプロジェクトの初期化
 apply from: "${gradleScriptDir}/db-migration.gradle" // DBマイグレーション
 apply from: "${gradleScriptDir}/build-shared.gradle" // 共有プロジェクトのビルド
