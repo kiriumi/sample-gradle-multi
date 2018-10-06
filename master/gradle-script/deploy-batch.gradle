@@ -9,6 +9,7 @@ ext {
     // マスタープロジェクトに集約する配布リソース情報
     masterDistsDir = "${distsDir}/${deployRootDir}"
     distFilename = String.format("${deployRootDir}-%s.zip", new Date().format('yyyyMMdd'))
+    diffDeploiedDir= "${projectDir}/diff-deploied"
 
     // デプロイ対象リソース
     def none = ['none']
@@ -20,6 +21,22 @@ ext {
     isUt = environment == envUt
 }
 
+// コピーしたファイルの更新日時を維持する
+def preserveTimestamp = { copyTask ->
+
+    def copyTasks = []
+    copyTask.eachFile { copyTasks <<  it }
+
+    copyTask.doLast{
+        copyTasks.each { copyFileDetails ->
+            def target = new File(destinationDir, copyFileDetails.path)
+            if(target.exists()) { target.setLastModified(copyFileDetails.lastModified) }
+        }
+    }
+}
+
+
+// 更新日時を維持し、コピー
 def copyWithTimestamp = { batchProject, fromDir, intoDir , includes ->
 
     def surffix = file(intoDir).name
@@ -30,8 +47,8 @@ def copyWithTimestamp = { batchProject, fromDir, intoDir , includes ->
 
             from fromDir
 
-            if(!environment.equals('REL')) {
-                // 開発時は該当の面のシェルをコピー
+            if(environment != envUt) {
+                // UT以外は該当の面のシェルをコピー
                 from "${fromDir}_${environment}"
             }
 
@@ -42,10 +59,10 @@ def copyWithTimestamp = { batchProject, fromDir, intoDir , includes ->
             def copyDetails = []
             eachFile { copyDetails << it }
             doLast {
-                    copyDetails.each { FileCopyDetails details ->
-                            def target = new File(destinationDir, details.path)
-                            if(target.exists()) { target.setLastModified(details.lastModified) }
-                    }
+                copyDetails.each { FileCopyDetails details ->
+                    def target = new File(destinationDir, details.path)
+                    if(target.exists()) { target.setLastModified(details.lastModified) }
+                }
             }
         }
     }
@@ -145,4 +162,13 @@ task deployBatch << {
             execute("find ${deployRootDir}/${jarDir} -type f -user ${resourceOwner} | xargs chmod ${modeJar}")
         }
     }
+}
+
+// デプロイリソースを、差分比較用ディレクトリにコピー
+task copyDeploied (type: Copy){
+
+   // 配布リソースをdiffにコピー（更新日時も維持
+    from "${distsDir}/${deployRootDir}"
+    into "${diffDeploiedDir}/${deployHost}"
+    preserveTimestamp(it)
 }
