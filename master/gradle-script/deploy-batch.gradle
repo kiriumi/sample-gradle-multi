@@ -21,48 +21,18 @@ ext {
     isUt = environment == envUt
 }
 
-// コピーしたファイルの更新日時を維持する
-def preserveTimestamp = { copyTask ->
+// 拡張コピータスククラス
+class CopyExtended extends Copy {
 
-    def copyTasks = []
-    copyTask.eachFile { copyTasks <<  it }
+    def presereveTimestamp() {
 
-    copyTask.doLast{
-        copyTasks.each { copyFileDetails ->
-            def target = new File(destinationDir, copyFileDetails.path)
-            if(target.exists()) { target.setLastModified(copyFileDetails.lastModified) }
-        }
-    }
-}
+        def copyTasks = []
+        eachFile { copyTasks <<  it } // eachFileの実行タイミングはdoLastと同じ
 
-
-// 更新日時を維持し、コピー
-def copyWithTimestamp = { batchProject, fromDir, intoDir , includes ->
-
-    def surffix = file(intoDir).name
-
-    project( ":${batchProject}") {
-
-        task "copy${surffix}"(type: Copy) {
-
-            from fromDir
-
-            if(environment != envUt) {
-                // UT以外は該当の面のシェルをコピー
-                from "${fromDir}_${environment}"
-            }
-
-            into intoDir
-            include includes
-
-            // 更新日時を維持する
-            def copyDetails = []
-            eachFile { copyDetails << it }
-            doLast {
-                copyDetails.each { FileCopyDetails details ->
-                    def target = new File(destinationDir, details.path)
-                    if(target.exists()) { target.setLastModified(details.lastModified) }
-                }
+        doLast {
+            copyTasks.each { copyFileDetails ->
+                def destFile = new File(destinationDir, copyFileDetails.path)
+                if(destFile.exists()) { destFile.setLastModified(copyFileDetails.lastModified) }
             }
         }
     }
@@ -71,9 +41,35 @@ def copyWithTimestamp = { batchProject, fromDir, intoDir , includes ->
 // バッチプロジェクト共通
 batchProjects.each { batchProject ->
 
-    // シェルと設定ファイルをコピー
-    copyWithTimestamp(batchProject, "${deployRootDir}/${shellDir}", "${masterDistsDir}/${shellDir}", includeShells)
-    copyWithTimestamp(batchProject, "$deployRootDir}/${confDir}", "${masterDistsDir}/${confDir}", includeConfs)
+
+    project( ":${batchProject}") {
+
+         // シェルをコピー
+        task copyShell(type: CopyExtended) {
+            from "${deployRootDir}/${shellDir}"
+
+            if(environment != envUt) {
+                from "${deployRootDir}/${shellDir}_${environment}"
+            }
+
+            into "${masterDistsDir}/${shellDir}"
+            include includeShells
+            presereveTimestamp()
+        }
+
+        // 設定ファイルをコピー
+        task copyConf(type: CopyExtended) {
+            from "${deployRootDir}/${confDir}"
+
+            if(environment != envUt) {
+                from "${deployRootDir}/${confDir}_${environment}"
+            }
+
+            into "${masterDistsDir}/${confDir}"
+            include includeConfs
+            presereveTimestamp()
+        }
+    }
 }
 
 // 業務バッチプロジェクト
@@ -82,14 +78,16 @@ batchBizProjects.each { batchBizProject ->
     project( ":${batchBizProject}") {
 
         // Jarをコピー
-        task "copy${jarDir}" << {
+        task copyJar << {
 
+            // 業務Jar
             copy {
                 from libsDir
                 into "${masterDistsDir}/${jarDir}"
                 include includeJars
             }
 
+            // 依存Jar
             copy {
                 from configurations.compile
                 into "${masterDistsDir}/${dependenciesDir}"
@@ -130,8 +128,6 @@ ssh.settings {
 // デプロイ
 task deployBatch << {
 
-    def deployWorkDir = '/WORK/deploy'
-
     ssh.run {
 
         session(remotes.transferer)  {
@@ -165,10 +161,10 @@ task deployBatch << {
 }
 
 // デプロイリソースを、差分比較用ディレクトリにコピー
-task copyDeploied (type: Copy){
+task copyDeploied (type: CopyExtended){
 
    // 配布リソースをdiffにコピー（更新日時も維持
     from "${distsDir}/${deployRootDir}"
     into "${diffDeploiedDir}/${deployHost}"
-    preserveTimestamp(it)
+    presereveTimestamp()
 }
