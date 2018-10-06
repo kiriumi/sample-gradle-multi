@@ -18,7 +18,7 @@ dependencies {
     compile group: 'com.codeborne', name: 'selenide', version: '4.14.2'
     testCompile group: 'org.jacoco', name: 'org.jacoco.agent', version: '0.8.2'
 
-    providedCompile fileTree(dir: localWebServerLibDir, include: '**/*.jar')
+    providedCompile fileTree(dir: localWebServerLibDir, include: 'java*/**/*.jar')
 
     def cargoVersion = '1.4.5'
     cargo "org.codehaus.cargo:cargo-core-uberjar:${cargoVersion}",

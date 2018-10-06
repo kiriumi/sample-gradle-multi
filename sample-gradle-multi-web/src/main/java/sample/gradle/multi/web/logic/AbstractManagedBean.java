@@ -1,4 +1,4 @@
-package logic;
+package sample.gradle.multi.web.logic;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
