@@ -1,6 +1,6 @@
 /*
  * バッチ関連のリソースをマスターに集約し、デプロイする
- * ・実行タスク：clean copyShells copyConfs copyJars deployBatch commitDeploied
+ * ・実行タスク：clean deployBatch commitDeploied tagDeploied
  *
  */
  apply plugin: 'org.hidetake.ssh'
@@ -15,14 +15,33 @@ ext {
     diffDeploiedDir= "${projectDir}/diff-deploied"
 
     // デプロイ対象リソース
-    def none = ['none']
-    includeShells = deployShells.trim().isEmpty() ? none : deployShells.split()
-    includeConfs = deployConfs.trim().isEmpty() ? none : deployConfs.split()
-    includeJars = deproyJars.trim().isEmpty() ? none : deproyJars.split().collect { "${it}-*.jar" }
-    includeDependencies = deproyDependencies.trim().isEmpty() ? none : deproyDependencies.split().collect { "${it}-*.jar" }
+    includeShells = getAsArray(deployShells)
+    includeConfs = getAsArray(deployConfs)
+    includeJars = getAsJarArray(deproyJars)
+    includeDependencies = getAsJarArray(deproyDependencies)
+
+    // 削除対象リソース
+    removeShells = getAsArray(deleteShells)
+    removeConfs = getAsArray(deleteConfs)
+    removeJars = getAsJarArray(deleteJars)
+    removeDependencies = getAsJarArray(deleteDependencies)
 
     // 指定された環境がUTか判定
     isUt = (environment == envUt)
+}
+
+// プロパティファイルで指定されたリソースを配列にする
+// ※空文字の場合は、空振りさせるためnoneを返す
+def getAsArray(targets) {
+
+    return targets.trim().isEmpty() ? ['none'] : targets.split()
+}
+
+// プロパティファイルで指定されたJarを配列にする
+// ※空文字の場合は、空振りさせるためnoneを返す
+def getAsJarArray(targetJars) {
+
+    return targetJars.trim().isEmpty() ? ['none'] : targetJars.split().collect{ "${it}-*.jar" }
 }
 
 // サーバ接続情報
@@ -130,8 +149,32 @@ batchBizProjects.each {
 
 // 配布リソースを圧縮
 task zipDists(type: Zip)  {
+
+    // サブプロジェクトの依存タスク
+    batchProjects.each { dependsOn( ["${it}:copyShells", "${it}:copyConfs"]) }
+    batchBizProjects.each { dependsOn("${it}:copyJars") }
+
     archiveName = distFilename
     from masterDistsDir
+}
+
+// リソース削除
+task deleteDeploied << {
+
+    ssh.run {
+
+        session(remotes.deployer)  {
+
+            def remove = { targetDir, targets ->
+                targets.each{ execute("rm -f ${deployRootDir}/${targetDir}/${it}") }
+            }
+
+            remove(shellDir, removeShells)
+            remove(confDir, removeConfs)
+            remove(jarDir, removeJars)
+            remove(dependenciesDir, removeDependencies)
+        }
+    }
 }
 
 // デプロイ
@@ -161,10 +204,14 @@ task deployBatch(dependsOn: zipDists) << {
 
             // 権限変更
             def resourceOwner = remotes.deployer.user
+            def changeMode = { targetDir, mode ->
+                execute("find ${deployRootDir}/${targetDir} -type f -user ${resourceOwner} | xargs chmod ${mode}")
+            }
+
+            changeMode(shellDir, modeShell)
+            changeMode(confDir, modeConf)
+            changeMode(jarDir, modeJar)
             execute("find ${deployRootDir}/${shellDir} ${deployRootDir}/${confDir} ${deployRootDir}/${jarDir} -type d -user ${resourceOwner} | xargs chmod ${modeDir}")
-            execute("find ${deployRootDir}/${shellDir} -type f -user ${resourceOwner} | xargs chmod ${modeShell}")
-            execute("find ${deployRootDir}/${confDir} -type f -user ${resourceOwner} | xargs chmod ${modeConf}")
-            execute("find ${deployRootDir}/${jarDir} -type f -user ${resourceOwner} | xargs chmod ${modeJar}")
         }
     }
 }
@@ -176,21 +223,6 @@ task copyDeploied (type: CopyExtended){
     from "${distsDir}/${deployRootDir}"
     into "${diffDeploiedDir}/${deployHost}"
     presereveTimestamp()
-}
-
-// リソース削除
-task deleteDeploied << {
-
-    ssh.run {
-
-        session(remotes.deployer)  {
-
-            deleteShells.sprlit().each{ execute("rm ${deployRootDir}/${shellDir}/${it}") }
-            deleteConfs.sprlit().each{ execute("rm ${deployRootDir}/${confDir}/${it}") }
-            deleteJars.sprlit().each{ execute("rm ${deployRootDir}/${jarDir}/${it}-*.jar") }
-            deleteDependencies.sprlit().each{ execute("rm ${deployRootDir}/${dependenciesDir}/${it}-*.jar") }
-        }
-    }
 }
 
 // デプロイリソースをSVNにコミット
