@@ -200,7 +200,7 @@ task deployBatch(dependsOn: zipDists) << {
             includeDependencies.each{execute("rm -f ${deployRootDir}/${dependenciesDir}/${it}") }
 
             // デプロイ
-            execute("cp -ra ${deployWorkDir}/${deployRootDir} ${deployRootDir}") // デプロイ
+            execute("cp -ra ${deployWorkDir}/${deployRootDir} ${deployRootDir}")
 
             // 権限変更
             def resourceOwner = remotes.deployer.user
