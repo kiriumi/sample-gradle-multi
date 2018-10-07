@@ -58,6 +58,8 @@ subprojects {
     task initSubrojects(dependsOn: [makeSourceDir, makeDirs])
 }
 
+// ディレクトリ作成
 private makeDirIfNotExist(File dir) {
+
      if(!dir.exists()) { dir.mkdirs() }
 }

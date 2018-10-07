@@ -1,6 +1,6 @@
 /*
  * バッチ関連のリソースをマスターに集約し、デプロイする
- * ・実行タスク：clean copyShell copyConf copyJar deployBatch commitDeploied
+ * ・実行タスク：clean copyShells copyConfs copyJars deployBatch commitDeploied
  *
  */
  apply plugin: 'org.hidetake.ssh'
@@ -73,10 +73,10 @@ class CopyExtended extends Copy {
 // 各バッチプロジェクトのシェルと設定ファイルをマスターにコピー
 batchProjects.each { batchProject ->
 
-    project( ":${batchProject}") {
+    project(":${batchProject}") {
 
          // シェルをコピー
-        task copyShell(type: CopyExtended) {
+        task copyShells(type: CopyExtended) {
             from "${deployRootDir}/${shellDir}"
 
             if(environment != envUt) {
@@ -89,7 +89,7 @@ batchProjects.each { batchProject ->
         }
 
         // 設定ファイルをコピー
-        task copyConf(type: CopyExtended) {
+        task copyConfs(type: CopyExtended) {
             from "${deployRootDir}/${confDir}"
 
             if(environment != envUt) {
@@ -109,7 +109,7 @@ batchBizProjects.each { batchBizProject ->
     project( ":${batchBizProject}") {
 
         // Jarをコピー
-        task copyJar << {
+        task copyJars << {
 
             // 業務Jar
             copy {
@@ -179,7 +179,7 @@ task copyDeploied (type: CopyExtended){
 }
 
 // リソース削除
-task deleteDeploied {
+task deleteDeploied << {
 
     ssh.run {
 
@@ -195,12 +195,14 @@ task deleteDeploied {
 
 // デプロイリソースをSVNにコミット
 task commitDeploied(type: svnCommitTask, dependsOn: copyDeploied) {
+
     source <<  "${diffDeploiedDir}/${deployHost}"
     commitMessage = svnCommitDeploiedMessage
 }
 
 // デプロイ後にタグ付け
 task tagDeploied(type: svnTagTask) {
+
     tagName = branchName
     commitMessage = svnTagMessage
 }

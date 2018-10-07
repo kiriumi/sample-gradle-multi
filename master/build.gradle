@@ -16,7 +16,7 @@ ext{
     // SVNのタスククラス
     // ※拡張プロパティを通さないと、外部Gradleスクリプト側でクラスと認識されない
     svnCommitTask = at.bxm.gradleplugins.svntools.tasks.SvnCommit
-    svntTagTask = at.bxm.gradleplugins.svntools.tasks.SvnTag
+    svnTagTask = at.bxm.gradleplugins.svntools.tasks.SvnTag
 }
 
 // 外部Gradleスクリプトの適用
@@ -26,4 +26,4 @@ apply from: "${gradleScriptDir}/init-subprojects.gradle" // サブプロジェ�
 apply from: "${gradleScriptDir}/db-migration.gradle" // DBマイグレーション
 apply from: "${gradleScriptDir}/build-shared.gradle" // 共有プロジェクトのビルド
 apply from: "${gradleScriptDir}/test.gradle" // テスト
-//apply from: "${gradleScriptDir}/deploy-batch.gradle" // デプロイ
+apply from: "${gradleScriptDir}/deploy-batch.gradle" // デプロイ

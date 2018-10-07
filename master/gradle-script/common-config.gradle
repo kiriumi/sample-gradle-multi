@@ -1,16 +1,17 @@
 // 拡張プロパティ
 ext{
-    // マスタープロジェクトのリソースディレクトリ
-    masterResourcesDir = file('resources')
-    checkstyleDir = file("${masterResourcesDir}/checkstyle")
-    jacocoDir= file("${masterResourcesDir}/jacoco")
-
     // プロジェクト一覧
     sharedProjects = getProjectNames(sharedContainsStrs) // 共有プロジェクト
     batchProjects = getProjectNames(batchContainsStrs) // バッチプロジェクト
     onlineProjects = getProjectNames(onlineContainsStrs) // オンラインプロジェクト
     batchBizProjects = batchProjects - sharedProjects // 業務バッチプロジェクト
     onlineBizProjects =  onlineProjects - sharedProjects // 業務オンラインプロジェクト
+    bizProjects = batchBizProjects + onlineBizProjects // 業務プロジェクト
+
+    // マスタープロジェクトのリソースディレクトリ
+    masterResourcesDir = file('resources')
+    checkstyleDir = file("${masterResourcesDir}/checkstyle")
+    jacocoDir= file("${masterResourcesDir}/jacoco")
 }
 
 // 全プロジェクト共通
@@ -20,20 +21,27 @@ allprojects {
 
     tasks.withType(JavaCompile){ options.encoding = 'UTF-8' }
 
+    // 設定
     configurations.all {
-        // 依存関係のあるJarに「changing = true」を付けると、ローカルにキャッシュしなくなる
+        // 依存関係のあるJarに「, changing = true」を付けると、ローカルにキャッシュしなくなる
         resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
     }
 
+    // 依存関係
+    dependencies {
+        // DBマイグレーションのクリーンタスクが使用するため、全プロジェクト共通
+        compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    }
+
     repositories {
-        mavenCentral()
-        mavenLocal()
-        maven { url innerMavenRepoUrl }
+
+        mavenCentral() // セントラルMavenリポジトリ
+        maven { url innerMavenRepoUrl } // 社内Mavenリポジトリ
+        mavenLocal() // ローカルMavenリポジトリ
     }
 }
 
 // サブプロジェクト共通
-// ※JDBCの依存関係はDBマイグレーションのGradleスクリプトで定義すること
 subprojects{
 
     group = "${baseGroupId}.${groupId}"
@@ -47,10 +55,18 @@ subprojects{
 
         compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
         compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
-        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
+    }
+}
 
-        // 外部リソースのクラスパス
-        runtime files("${deployRootDir}/${confDir}")
+// 業務プロジェクト共通
+bizProjects.each { bizProject ->
+
+    project(":$bizProject") {
+
+        // 依存関係
+        dependencies {
+            runtime files("${deployRootDir}/${confDir}") // 外部リソースのクラスパス
+        }
     }
 }
 

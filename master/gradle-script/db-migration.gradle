@@ -3,14 +3,23 @@
  * ・実行タスク：cleanDb migrateDb
  *
  */
-
-allprojects {
+subprojects {
 
     apply plugin: 'org.flywaydb.flyway'
 
-    // 依存関係
-    dependencies {
-        compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    // DBマイグレーション
+    task migrateDb(type: flywayMigrateTask) {
+
+        driver = jdbcDriver
+        url = jdbcUrl
+        user = jdbcUser
+        password = jdbcPassword
+        schemas = [ jdbcSchema ]
+
+        locations = [ "filesystem:${projectDir}/${dbMigreSqlDir}" ]
+        sqlMigrationPrefix = dbMigreSqlPrefix
+
+        outOfOrder = true
     }
 }
 
@@ -22,21 +31,4 @@ task cleanDb(type: flywayCleanTask) {
     user = jdbcUser
     password = jdbcPassword
     schemas = [jdbcSchema]
-}
-
-subprojects {
-
-    // DBマイグレーション
-    task migrateDb(type: flywayMigrateTask) {
-
-        driver = jdbcDriver
-        url = jdbcUrl
-        user = jdbcUser
-        password = jdbcPassword
-        schemas = [ jdbcSchema ]
-        locations = [ "filesystem:${projectDir}/${dbMigreSqlDir}" ]
-        sqlMigrationPrefix = dbMigreSqlPrefix
-
-        outOfOrder = true
-    }
 }
