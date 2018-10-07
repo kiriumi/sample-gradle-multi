@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <app_db1 id="1" name="一郎" age="10" />
+    <app_db1 id="2" name="二郎" age="20"/>
+    <app_db1 id="3" name="三郎" age="30"/>
+
+    <app_db2 id="1" name="一郎" />
+    <app_db2 id="2" name="二郎" />
+</dataset>
