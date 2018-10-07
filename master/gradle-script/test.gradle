@@ -18,6 +18,7 @@ subprojects{
     }
 
     checkstyle {
+
         configFile = file("${checkstyleDir}/${checkstyleConfigFile}")
         ignoreFailures = true
     }
@@ -25,13 +26,16 @@ subprojects{
     checkstyleTest.excludes = ['**/*']
 
     spotbugs {
+
         ignoreFailures = true
     }
 
     spotbugsTest.excludes = ['**/*']
 
     test {
+
         jacoco {
+
             append = false
             destinationFile = file("${reportsDir}/jacoco/jacoco.exec")
         }

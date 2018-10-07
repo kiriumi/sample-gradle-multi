@@ -51,10 +51,14 @@ sharedProjects.each {
 
                 configuration = configurations.deployerJars
 
-                // 社内Mavenリポジトリ
-                if(!innerMavenRepoUploadUrl.isEmpty()) {
+                if(!innerMavenRepoUploadUrl.trim().isEmpty()) {
+
+                     // 社内Mavenリポジトリ
                     repository(url: innerMavenRepoUploadUrl) {
-                        authentication(userName: innerMavenRepoUser, password: innerMavenRepoPassword)
+
+                        authentication(
+                            userName: innerMavenRepoUser,
+                            password: innerMavenRepoPassword)
                     }
                 }
             }
