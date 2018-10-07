@@ -11,6 +11,4 @@ def subprojectTree = fileTree(dir: settingsDir.parent, includes: subprojectNames
 subprojectTree.visit { subproject -> includedProjects.add(subproject.name) }
 
 // 同階層内に存在するサブプロジェクトのみインクルード
-includedProjects.each { includedProject ->
-    includeFlat includedProject
-}
+includedProjects.each { includeFlat it }

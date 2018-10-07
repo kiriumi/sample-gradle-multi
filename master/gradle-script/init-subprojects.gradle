@@ -20,16 +20,12 @@ subprojects {
 
         // javaのソースディレクトリ作成（パッケージを含む）
         def makePackages = { javaSet ->
-            javaSet.srcDirs.each { sourceDir ->
-                makeDirIfNotExist(new File(sourceDir, packagePath))
-            }
+            javaSet.srcDirs.each { makeDirIfNotExist(new File(it, packagePath)) }
         }
 
         // resoucesのソースディレクトリ作成
         def makeResourceDir = { resourceSet ->
-            resourceSet.srcDirs.each { sourceDir ->
-                makeDirIfNotExist(sourceDir)
-            }
+            resourceSet.srcDirs.each { makeDirIfNotExist(it) }
         }
 
         makePackages sourceSets.main.java
@@ -49,9 +45,10 @@ subprojects {
         makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${confDir}"))
 
         // 各環境の外部リソースのディレクトリ
-        envAfterUt.each { env ->
-             makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${shellDir}_${env}"))
-             makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${confDir}_${env}"))
+        envAfterUt.each {
+
+             makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${shellDir}_${it}"))
+             makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${confDir}_${it}"))
         }
     }
 

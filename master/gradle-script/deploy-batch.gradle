@@ -58,11 +58,11 @@ class CopyExtended extends Copy {
 
     def presereveTimestamp() {
 
-        def copyTasks = []
-        eachFile { copyTasks <<  it } // eachFileの実行タイミングはdoLastと同じ
+        def copyFileDetailses = []
+        eachFile { copyFileDetailses <<  it } // eachFileの実行タイミングはdoLastと同じ
 
         doLast {
-            copyTasks.each { copyFileDetails ->
+            copyFileDetailses.each { copyFileDetails ->
                 def destFile = new File(destinationDir, copyFileDetails.path)
                 if(destFile.exists()) { destFile.setLastModified(copyFileDetails.lastModified) }
             }
@@ -71,9 +71,9 @@ class CopyExtended extends Copy {
 }
 
 // 各バッチプロジェクトのシェルと設定ファイルをマスターにコピー
-batchProjects.each { batchProject ->
+batchProjects.each {
 
-    project(":${batchProject}") {
+    project(":${it}") {
 
          // シェルをコピー
         task copyShells(type: CopyExtended) {
@@ -104,9 +104,9 @@ batchProjects.each { batchProject ->
 }
 
 // 業務プロジェクトのJarをマスターにコピー
-batchBizProjects.each { batchBizProject ->
+batchBizProjects.each {
 
-    project( ":${batchBizProject}") {
+    project( ":${it}") {
 
         // Jarをコピー
         task copyJars << {
@@ -153,8 +153,8 @@ task deployBatch(dependsOn: zipDists) << {
         session(remotes.deployer)  {
 
             // 他バージョンのJarを削除
-            includeJars.each{ targetJar -> execute("rm -f ${deployRootDir}/${jarDir}/${targetJar}") }
-            includeDependencies.each{ targetJar -> execute("rm -f ${deployRootDir}/${dependenciesDir}/${targetJar}") }
+            includeJars.each{ execute("rm -f ${deployRootDir}/${jarDir}/${it}") }
+            includeDependencies.each{execute("rm -f ${deployRootDir}/${dependenciesDir}/${it}") }
 
             // デプロイ
             execute("cp -ra ${deployWorkDir}/${deployRootDir} ${deployRootDir}") // デプロイ

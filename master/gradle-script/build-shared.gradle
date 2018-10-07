@@ -4,9 +4,9 @@
  *
  */
 // 共有プロジェクト共通
-sharedProjects.each { sharedProject ->
+sharedProjects.each {
 
-    project( ":${sharedProject}") {
+    project( ":${it}") {
 
         apply plugin: 'maven'
 

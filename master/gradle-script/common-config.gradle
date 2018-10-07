@@ -59,9 +59,9 @@ subprojects{
 }
 
 // 業務プロジェクト共通
-bizProjects.each { bizProject ->
+bizProjects.each {
 
-    project(":$bizProject") {
+    project(":${it}") {
 
         // 依存関係
         dependencies {
