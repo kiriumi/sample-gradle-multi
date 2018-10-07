@@ -178,7 +178,7 @@ task deleteDeploied << {
 }
 
 // デプロイ
-task deployBatch(dependsOn: zipDists) << {
+task deployBatch(dependsOn: [zipDists, deleteDeploied]) << {
 
     ssh.run {
 

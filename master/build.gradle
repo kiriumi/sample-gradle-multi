@@ -1,3 +1,9 @@
+/*
+ * ビルドスクリプトを統括
+ * ・実行タスク（CI）：clean cleanDb migrateDb assemble cargoStartLocal check cargoStopLocal afterBuild uploadArchives
+ * ・実行タスク（リリース）：clean migrateDb assemble afterBuild uploadArchives deployBatch cargoUndeployRemote cargoDeployRemote commitDeploied tagDeploied
+ */
+
 // 外部プラグインの適用
 plugins {
   id 'com.github.spotbugs' version '1.6.4' // 静的解析
