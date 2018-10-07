@@ -21,13 +21,14 @@ allprojects {
 
     // 設定
     configurations.all {
-        // 依存関係のあるJarに「, changing = true」を付けると、ローカルにキャッシュしなくなる
+        // 依存関係のローカルキャッシュ無効化（「changing: true」を対象の依存関係の付与する）
+        //   例：compile group: （中略） version: '2.11.1', changing: true
         resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
     }
 
     // 依存関係
     dependencies {
-        // DBマイグレーションのクリーンタスクが使用するため、全プロジェクト共通
+        // DBマイグレーションのDBクリーンタスクが使用するため、全プロジェクト共通
         compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     }
 
