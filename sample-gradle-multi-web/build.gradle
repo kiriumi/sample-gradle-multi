@@ -1,3 +1,9 @@
+/*
+ * Warを作成しWebサーバにデプロイする。（開発の場合はテストも実施）
+ * ・実行タスク（開発）：clean assemble cargoStartLocal check cargoStopLocal
+ * ・実行タスク（本番）：clean assemble cargoUndeployRemote cargoDeployRemote
+ *
+ */
 plugins {
   id 'war'
   id 'eclipse-wtp'
@@ -14,7 +20,6 @@ dependencies {
 
     //compile project(':sample-gradle-multi-shared')
 
-    //testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.14.0'
     compile group: 'com.codeborne', name: 'selenide', version: '4.14.2'
     testCompile group: 'org.jacoco', name: 'org.jacoco.agent', version: '0.8.2'
 
@@ -46,24 +51,19 @@ cargo {
     }
 
     local {
-        // タスク：clean war cargoStartLocal check
-        // タスク：clean assemble cargoRedeployLocal
-        homeDir = localWebServerHome // プロジェクト内にサーバがあることを想定
+
+        homeDir = localWebServerHome
         timeout = 10000
 
-        // jacocoAgentVersion = '0.8.2'
-        //def jacocoAagentJar =  fileTree(dir: gradle.gradleUserHomeDir, include: "**/org.jacoco.agent-$jacocoAgentVersion" + '.jar')[0].path
-        def jacocoAagentJar = new File(rootProject.projectDir , "${jacocoDir}/jacocoagent.jar").path
+        def jacocoAagentJar = new File("${jacocoDir}/jacocoagent.jar").path
         def jacocoReport = new File(reportsDir, 'jacoco/jacoco.exec').path
 
         jvmArgs = "-Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true "
-        //jvmArgs += "-javaagent:${jacocoAagentJar}=destfile=${jacocoReport},append=true"
-
-        println jvmArgs
+        jvmArgs += "-javaagent:${jacocoAagentJar}=destfile=${jacocoReport},append=false,excludes=**/Test*.class:**/*Test.class"
     }
 
     remote {
-        // タスク：clean assemble cargoUndeployRemote cargoDeployRemote
+
         hostname = cargoHostName
         username = cargoHostUser
         password = cargoHostPassword
