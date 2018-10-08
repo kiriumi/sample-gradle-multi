@@ -101,6 +101,8 @@ onlineBizProjects.each { project(":${it}") {
     apply plugin: 'war'
     apply plugin: 'eclipse-wtp'
 
+    eclipse.wtp.component { contextPath  = contextPath }
+
     dependencies {
 
         testCompile group: 'com.codeborne', name: 'selenide', version: '4.14.2'
