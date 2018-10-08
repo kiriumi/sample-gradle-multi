@@ -20,6 +20,7 @@
 ################
 bin
 .settings
+.classpath
 
 # STS (Spring Tool Suite)
 .springBeans
