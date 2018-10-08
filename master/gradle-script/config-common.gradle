@@ -1,21 +1,6 @@
 // 拡張プロパティ
 ext{
     // プロジェクト一覧
-    /*
-    sharedProjects = getProjectNames(containsStrsShared) // 共有プロジェクト
-    batchProjects = getProjectNames(containsStrsBatch) // バッチプロジェクト
-    onlineProjects = getProjectNames(containsStrsOnline) // オンラインプロジェクト
-    batchBizProjects = batchProjects - sharedProjects // 業務バッチプロジェクト
-    onlineBizProjects =  onlineProjects - sharedProjects // 業務オンラインプロジェクト
-    bizProjects = batchBizProjects + onlineBizProjects // 業務プロジェクト
-    */
-
-    // マスタープロジェクトのリソースディレクトリ
-    masterResourcesDir = file('resources')
-    checkstyleDir = file("${masterResourcesDir}/checkstyle")
-    jacocoDir= file("${masterResourcesDir}/jacoco")
-
-
     sharedProjects = getProjects(containsStrsShared) // 共有プロジェクト
     batchProjects = getProjects(containsStrsBatch) // バッチプロジェクト
     onlineProjects = getProjects(containsStrsOnline) // オンラインプロジェクト
@@ -23,8 +8,10 @@ ext{
     onlineBizProjects =  onlineProjects - sharedProjects // 業務オンラインプロジェクト
     bizProjects = batchBizProjects + onlineBizProjects // 業務プロジェクト
 
-
-
+    // マスタープロジェクトのリソースディレクトリ
+    masterResourcesDir = file('resources')
+    checkstyleDir = file("${masterResourcesDir}/checkstyle")
+    jacocoDir= file("${masterResourcesDir}/jacoco")
 }
 
 // 全プロジェクト共通
