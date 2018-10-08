@@ -7,8 +7,8 @@
  apply plugin: 'at.bxm.svntools'
 
 ext {
+    none = ['none']
     // マスタープロジェクトに集約する配布リソース情報
-    masterDistsDir = "${distsDir}/${deployRootDir}"
     distFilename = String.format("${deployRootDir}-%s.zip", new Date().format('yyyyMMdd'))
 
     // デプロイしたリソースの差分比較用ディレクトリ
@@ -34,42 +34,14 @@ ext {
 // ※空文字の場合は、空振りさせるためnoneを返す
 def getAsArray(targets) {
 
-    return targets.trim().isEmpty() ? ['none'] : targets.split()
+    return targets.trim().isEmpty() ? none : targets.split()
 }
 
 // プロパティファイルで指定されたJarを配列にする
 // ※空文字の場合は、空振りさせるためnoneを返す
 def getAsJarArray(targetJars) {
 
-    return targetJars.trim().isEmpty() ? ['none'] : targetJars.split().collect{ "${it}-*.jar" }
-}
-
-// サーバ接続情報
-remotes {
-
-    transferer {
-        host = deployHost
-        user = deployUser
-        password = deployPassword
-
-    }
-
-    deployer {
-        host = deployHost
-        user = deployUser
-        password = deployPassword
-    }
-}
-
-// SSH共通設定　
-ssh.settings {
-    knownHosts = allowAnyHosts
-}
-
-// SVN接続情報
-svntools {
-    username = svnUser
-    password = svnPassword
+    return targetJars.trim().isEmpty() ? none : targetJars.split().collect{ "${it}-*.jar" }
 }
 
 // 拡張コピータスククラス
@@ -89,152 +61,177 @@ class CopyExtended extends Copy {
     }
 }
 
-// 各バッチプロジェクトのシェルと設定ファイルをマスターにコピー
-batchProjects.each {
+batchBizProjects.each { project("${it}") {
 
-    project(":${it}") {
+    ext {
+        batchBizProjectDistsDir = distsDir
+    }
+
+    // シェルと設定ファイルをマスターにコピー
+    (sharedProjectNames + project.name).each { project(":${it}") {
+
 
          // シェルをコピー
         task copyShells(type: CopyExtended) {
-            from "${deployRootDir}/${shellDir}"
+
+            from "${projectDir}/${deployRootDir}/${shellDir}"
 
             if(environment != envUt) {
-                from "${deployRootDir}/${shellDir}_${environment}"
+                from "${projectDir}/${deployRootDir}/${shellDir}_${environment}"
             }
 
-            into "${masterDistsDir}/${shellDir}"
+            into "${batchBizProjectDistsDir}/${deployRootDir}/${shellDir}"
+
             include includeShells
             presereveTimestamp()
         }
 
         // 設定ファイルをコピー
         task copyConfs(type: CopyExtended) {
-            from "${deployRootDir}/${confDir}"
+
+            from "${projectDir}/${deployRootDir}/${confDir}"
 
             if(environment != envUt) {
-                from "${deployRootDir}/${confDir}_${environment}"
+                from "${projectDir}/${deployRootDir}/${confDir}_${environment}"
             }
 
-            into "${masterDistsDir}/${confDir}"
+            into "${batchBizProjectDistsDir}/${deployRootDir}/${confDir}"
             include includeConfs
             presereveTimestamp()
         }
+    }}
+
+    // Jarをコピー
+    task copyJars << {
+
+        // 業務Jar
+        copy {
+            from libsDir
+            into "${distsDir}/${deployRootDir}/${jarDir}"
+            include includeJars
+        }
+
+        // 依存Jar
+        copy {
+            from configurations.compile
+            into "${distsDir}/${deployRootDir}/${dependenciesDir}"
+            include includeDependencies
+        }
     }
-}
 
-// 業務プロジェクトのJarをマスターにコピー
-batchBizProjects.each {
+    // 配布リソースを圧縮
+    task zipDists(type: Zip)  {
 
-    project( ":${it}") {
+        archiveName = distFilename
+        from "${distsDir}/${deployRootDir}"
+    }
 
-        // Jarをコピー
-        task copyJars << {
+    // SSH共通設定　
+    ssh.settings {
+        knownHosts = allowAnyHosts
+    }
 
-            // 業務Jar
-            copy {
-                from libsDir
-                into "${masterDistsDir}/${jarDir}"
-                include includeJars
-            }
+    // サーバ接続情報
+    remotes {
 
-            // 依存Jar
-            copy {
-                from configurations.compile
-                into "${masterDistsDir}/${dependenciesDir}"
-                include includeDependencies
+        transferer {
+            host = deployHost
+            user = deployUser
+            password = deployPassword
+
+        }
+
+        deployer {
+            host = deployHost
+            user = deployUser
+            password = deployPassword
+        }
+    }
+
+    // リソース削除
+    task deleteDeploied << {
+
+        ssh.run {
+
+            session(remotes.deployer)  {
+
+                def remove = { targetDir, targets ->
+                    targets.each{ execute("rm -f ${deployRootDir}/${targetDir}/${it}") }
+                }
+
+                remove(shellDir, removeShells)
+                remove(confDir, removeConfs)
+                remove(jarDir, removeJars)
+                remove(dependenciesDir, removeDependencies)
             }
         }
     }
-}
 
-// 配布リソースを圧縮
-task zipDists(type: Zip)  {
+    // デプロイ
+    task deployBatch(dependsOn: [zipDists, deleteDeploied]) << {
 
-    // サブプロジェクトの依存タスク
-    batchProjects.each { dependsOn( ["${it}:copyShells", "${it}:copyConfs"]) }
-    batchBizProjects.each { dependsOn("${it}:copyJars") }
+        ssh.run {
 
-    archiveName = distFilename
-    from masterDistsDir
-}
+            session(remotes.transferer)  {
 
-// リソース削除
-task deleteDeploied << {
+                // 作業ディレクトリをクリーン
+                execute("rm -rf ${deployWorkDir}/*")
+                execute("mkdir -p -m ${modeDir} ${deployWorkDir}")
 
-    ssh.run {
-
-        session(remotes.deployer)  {
-
-            def remove = { targetDir, targets ->
-                targets.each{ execute("rm -f ${deployRootDir}/${targetDir}/${it}") }
+                // 配布リソースを転送し、解凍
+                put from: "${distsDir}/${distFilename}", into: deployWorkDir
+                execute("unzip -o ${deployWorkDir}/${distFilename} -d ${deployWorkDir}")
             }
 
-            remove(shellDir, removeShells)
-            remove(confDir, removeConfs)
-            remove(jarDir, removeJars)
-            remove(dependenciesDir, removeDependencies)
-        }
-    }
-}
+            session(remotes.deployer)  {
 
-// デプロイ
-task deployBatch(dependsOn: [zipDists, deleteDeploied]) << {
+                // 他バージョンのJarを削除
+                includeJars.each{ execute("rm -f ${deployRootDir}/${jarDir}/${it}") }
+                includeDependencies.each{execute("rm -f ${deployRootDir}/${dependenciesDir}/${it}") }
 
-    ssh.run {
+                // デプロイ
+                execute("cp -ra ${deployWorkDir}/${deployRootDir} ${deployRootDir}")
 
-        session(remotes.transferer)  {
+                // 権限変更
+                def resourceOwner = remotes.deployer.user
+                def changeMode = { targetDir, mode ->
+                    execute("find ${deployRootDir}/${targetDir} -type f -user ${resourceOwner} | xargs chmod ${mode}")
+                }
 
-            // 作業ディレクトリをクリーン
-            execute("rm -rf ${deployWorkDir}/*")
-            execute("mkdir -p -m ${modeDir} ${deployWorkDir}")
-
-            // 配布リソースを転送し、解凍
-            put from: "${distsDir}/${distFilename}", into: deployWorkDir
-            execute("unzip -o ${deployWorkDir}/${distFilename} -d ${deployWorkDir}")
-        }
-
-        session(remotes.deployer)  {
-
-            // 他バージョンのJarを削除
-            includeJars.each{ execute("rm -f ${deployRootDir}/${jarDir}/${it}") }
-            includeDependencies.each{execute("rm -f ${deployRootDir}/${dependenciesDir}/${it}") }
-
-            // デプロイ
-            execute("cp -ra ${deployWorkDir}/${deployRootDir} ${deployRootDir}")
-
-            // 権限変更
-            def resourceOwner = remotes.deployer.user
-            def changeMode = { targetDir, mode ->
-                execute("find ${deployRootDir}/${targetDir} -type f -user ${resourceOwner} | xargs chmod ${mode}")
+                changeMode(shellDir, modeShell)
+                changeMode(confDir, modeConf)
+                changeMode(jarDir, modeJar)
+                execute("find ${deployRootDir}/${shellDir} ${deployRootDir}/${confDir} ${deployRootDir}/${jarDir} -type d -user ${resourceOwner} | xargs chmod ${modeDir}")
             }
-
-            changeMode(shellDir, modeShell)
-            changeMode(confDir, modeConf)
-            changeMode(jarDir, modeJar)
-            execute("find ${deployRootDir}/${shellDir} ${deployRootDir}/${confDir} ${deployRootDir}/${jarDir} -type d -user ${resourceOwner} | xargs chmod ${modeDir}")
         }
     }
-}
 
-// デプロイリソースを、差分比較用ディレクトリにコピー
-task copyDeploied (type: CopyExtended){
+    // デプロイリソースを、差分比較用ディレクトリにコピー
+    task copyDeploied (type: CopyExtended){
 
-   // 配布リソースをdiffにコピー
-    from "${distsDir}/${deployRootDir}"
-    into "${diffDeploiedDir}/${deployHost}"
-    presereveTimestamp()
-}
+       // 配布リソースをdiffにコピー
+        from "${distsDir}/${deployRootDir}"
+        into "${diffDeploiedDir}/${deployHost}"
+        presereveTimestamp()
+    }
 
-// デプロイリソースをSVNにコミット
-task commitDeploied(type: svnCommitTask, dependsOn: copyDeploied) {
+    // SVN接続情報
+    svntools {
+        username = svnUser
+        password = svnPassword
+    }
 
-    source <<  "${diffDeploiedDir}/${deployHost}"
-    commitMessage = svnCommitDeploiedMessage
-}
+    // デプロイリソースをSVNにコミット
+    task commitDeploied(type: svnCommitTask, dependsOn: copyDeploied) {
 
-// デプロイ後にタグ付け
-task tagDeploied(type: svnTagTask) {
+        source <<  "${diffDeploiedDir}/${deployHost}"
+        commitMessage = svnCommitDeploiedMessage
+    }
 
-    tagName = branchName
-    commitMessage = svnTagMessage
-}
+    // デプロイ後にタグ付け
+    task tagDeploied(type: svnTagTask) {
+
+        tagName = branchName
+        commitMessage = svnTagMessage
+    }
+}}

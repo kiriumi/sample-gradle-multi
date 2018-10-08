@@ -52,7 +52,7 @@ subprojects {
         }
     }
 
-    task initSubrojects(dependsOn: [makeSourceDir, makeDirs])
+    task initSubprojects(dependsOn: [makeSourceDir, makeDirs])
 }
 
 // ディレクトリ作成

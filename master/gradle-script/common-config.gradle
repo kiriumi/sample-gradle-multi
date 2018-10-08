@@ -74,9 +74,14 @@ subprojects{
 // 業務プロジェクト共通
 bizProjects.each { project(":${it}") {
 
+    ext {
+        sharedProjectNames = sharedProjectNames.split()
+    }
+
     // 依存関係
     dependencies {
 
+        sharedProjectNames.each{ compile project(":${it}") } // 共有プロジェクト
         runtime files("${deployRootDir}/${confDir}") // 外部リソースのクラスパス
     }
 }}
@@ -87,7 +92,6 @@ batchBizProjects.each { project(":${it}") {
     // 依存関係
     dependencies {
 
-        compile project(':sample-gradle-multi-shared')
     }
 }}
 
@@ -98,8 +102,6 @@ onlineBizProjects.each { project(":${it}") {
     apply plugin: 'eclipse-wtp'
 
     dependencies {
-
-        compile project(':sample-gradle-multi-shared')
 
         testCompile group: 'com.codeborne', name: 'selenide', version: '4.14.2'
     }

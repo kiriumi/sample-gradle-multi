@@ -1,4 +1,3 @@
 dependencies {
 
-    compile project(':sample-gradle-multi-shared')
 }
