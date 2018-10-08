@@ -83,6 +83,31 @@ bizProjects.each {
     }
 }
 
+// 業務Webプロジェクト共通
+onlineBizProjects.each {
+
+    project(":${it}") {
+
+        apply plugin: 'war'
+        apply plugin: 'eclipse-wtp'
+
+        ext {
+            localWebServerHome = new File(rootProject.projectDir, "web-server/$webServerHome")
+            localWebServerLibDir = new File(localWebServerHome, webServerLibDir)
+        }
+
+        dependencies {
+
+            compile project(':sample-gradle-multi-shared')
+
+            compile group: 'com.codeborne', name: 'selenide', version: '4.14.2'
+            providedCompile fileTree(dir: localWebServerLibDir, include: 'java*/**/*.jar')
+        }
+
+        eclipse.wtp.component { contextPath  = contextPath }
+    }
+}
+
 // 対象のプロジェクト名一覧を取得
 def getProjectNames(containsStrs) {
 

@@ -5,9 +5,6 @@
  *
  */
 plugins {
-  id 'war'
-  id 'eclipse-wtp'
-  id 'jacoco'
   id 'com.bmuschko.cargo' version '2.4'
 }
 
@@ -18,23 +15,9 @@ ext {
 
 dependencies {
 
-    compile project(':sample-gradle-multi-shared')
-
-    compile group: 'com.codeborne', name: 'selenide', version: '4.14.2'
-    providedCompile fileTree(dir: localWebServerLibDir, include: 'java*/**/*.jar')
-
     def cargoVersion = '1.4.5'
     cargo "org.codehaus.cargo:cargo-core-uberjar:${cargoVersion}",
           "org.codehaus.cargo:cargo-ant:${cargoVersion}"
-}
-
-eclipse {
-
-    wtp {
-        component {
-            contextPath  = contextPath
-        }
-    }
 }
 
 cargo {
