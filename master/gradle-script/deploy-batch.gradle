@@ -61,10 +61,10 @@ class CopyExtended extends Copy {
     }
 }
 
-configure(batchBizProjects){
+configure(bizBatchProjects){
 
     ext {
-        batchBizProjectDistsDir = distsDir
+        bizBatchProjectDistsDir = distsDir
     }
 
     // シェルと設定ファイルをマスターにコピー
@@ -79,7 +79,7 @@ configure(batchBizProjects){
                 from "${projectDir}/${deployRootDir}/${shellDir}_${environment}"
             }
 
-            into "${batchBizProjectDistsDir}/${deployRootDir}/${shellDir}"
+            into "${bizBatchProjectDistsDir}/${deployRootDir}/${shellDir}"
 
             include includeShells
             presereveTimestamp()
@@ -94,7 +94,7 @@ configure(batchBizProjects){
                 from "${projectDir}/${deployRootDir}/${confDir}_${environment}"
             }
 
-            into "${batchBizProjectDistsDir}/${deployRootDir}/${confDir}"
+            into "${bizBatchProjectDistsDir}/${deployRootDir}/${confDir}"
             include includeConfs
             presereveTimestamp()
         }

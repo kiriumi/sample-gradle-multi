@@ -3,10 +3,10 @@ ext{
     // プロジェクト一覧
     sharedProjects = getProjects(containsStrsShared) // 共有プロジェクト
     batchProjects = getProjects(containsStrsBatch) // バッチプロジェクト
-    onlineProjects = getProjects(containsStrsOnline) // オンラインプロジェクト
-    batchBizProjects = batchProjects - sharedProjects // 業務バッチプロジェクト
-    onlineBizProjects =  onlineProjects - sharedProjects // 業務オンラインプロジェクト
-    bizProjects = batchBizProjects + onlineBizProjects // 業務プロジェクト
+    webProjects = getProjects(containsStrsWeb) // オンラインプロジェクト
+    bizBatchProjects = batchProjects - sharedProjects // 業務バッチプロジェクト
+    bizWebProjects =  webProjects - sharedProjects // 業務オンラインプロジェクト
+    bizProjects = bizBatchProjects + bizWebProjects // 業務プロジェクト
 
     // マスタープロジェクトのリソースディレクトリ
     masterResourcesDir = file('resources')
@@ -95,7 +95,7 @@ configure(bizProjects) {
 }
 
 // 業務Webプロジェクト共通
-configure(onlineBizProjects) {
+configure(bizWebProjects) {
 
     apply plugin: 'war'
     apply plugin: 'eclipse-wtp'

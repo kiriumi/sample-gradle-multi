@@ -6,7 +6,7 @@
  */
  gradle.projectsEvaluated {
 
-    configure(onlineBizProjects) {
+    configure(bizWebProjects) {
 
         apply plugin: "com.bmuschko.cargo"
 

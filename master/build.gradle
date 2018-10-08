@@ -10,7 +10,7 @@ plugins {
   id 'org.flywaydb.flyway' version '5.1.4' // DBマイグレーション
   id 'org.hidetake.ssh' version '2.9.0' // SSH
   id 'at.bxm.svntools' version '2.2.1' // SVN
-  //id 'com.bmuschko.cargo' version '2.4'
+//  id 'com.bmuschko.cargo' version '2.4'
 }
 
 // 拡張プロパティ
