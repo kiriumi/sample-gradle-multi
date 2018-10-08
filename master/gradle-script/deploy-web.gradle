@@ -4,55 +4,52 @@
  * ・実行タスク（本番）：clean assemble cargoUndeployRemote cargoDeployRemote
  *
  */
- gradle.projectsEvaluated {
+configure(bizWebProjects) {
 
-    configure(bizWebProjects) {
+    apply plugin: "com.bmuschko.cargo"
 
-        apply plugin: "com.bmuschko.cargo"
+    ext {
+        localWebServerHome = new File(rootProject.projectDir, "web-server/$webServerHome")
+        localWebServerLibDir = new File(localWebServerHome, webServerLibDir)
+    }
 
-        ext {
-            localWebServerHome = new File(rootProject.projectDir, "web-server/$webServerHome")
-            localWebServerLibDir = new File(localWebServerHome, webServerLibDir)
+    dependencies {
+
+        providedCompile fileTree(dir: localWebServerLibDir, include: 'java*/**/*.jar')
+
+        def cargoVersion = '1.4.5'
+        cargo "org.codehaus.cargo:cargo-core-uberjar:${cargoVersion}",
+              "org.codehaus.cargo:cargo-ant:${cargoVersion}"
+    }
+
+    cargo {
+
+        containerId = cargoContainerId
+        port = Integer.parseInt(cargoPort)
+
+        deployable {
+            // ページを表示するためのURL：http://ホスト名/contextPath/ページ名
+            //   例：http://localhost:8080/SampleWebApp/login.xhtml
+            context = contextPath
         }
 
-        dependencies {
+        local {
 
-            providedCompile fileTree(dir: localWebServerLibDir, include: 'java*/**/*.jar')
+            homeDir = localWebServerHome
+            timeout = 10000
 
-            def cargoVersion = '1.4.5'
-            cargo "org.codehaus.cargo:cargo-core-uberjar:${cargoVersion}",
-                  "org.codehaus.cargo:cargo-ant:${cargoVersion}"
+            def jacocoAagentJar = new File("${jacocoDir}/jacocoagent.jar").path
+            def jacocoReport = new File(reportsDir, 'jacoco/jacoco.exec').path
+
+            jvmArgs = "-Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true "
+            jvmArgs += "-javaagent:${jacocoAagentJar}=destfile=${jacocoReport},append=false,excludes=**/Test*.class:**/*Test.class"
         }
 
-        cargo {
+        remote {
 
-            containerId = cargoContainerId
-            port = Integer.parseInt(cargoPort)
-
-            deployable {
-                // ページを表示するためのURL：http://ホスト名/contextPath/ページ名
-                //   例：http://localhost:8080/SampleWebApp/login.xhtml
-                context = contextPath
-            }
-
-            local {
-
-                homeDir = localWebServerHome
-                timeout = 10000
-
-                def jacocoAagentJar = new File("${jacocoDir}/jacocoagent.jar").path
-                def jacocoReport = new File(reportsDir, 'jacoco/jacoco.exec').path
-
-                jvmArgs = "-Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true "
-                jvmArgs += "-javaagent:${jacocoAagentJar}=destfile=${jacocoReport},append=false,excludes=**/Test*.class:**/*Test.class"
-            }
-
-            remote {
-
-                hostname = cargoHostName
-                username = cargoHostUser
-                password = cargoHostPassword
-            }
+            hostname = cargoHostName
+            username = cargoHostUser
+            password = cargoHostPassword
         }
     }
 }
