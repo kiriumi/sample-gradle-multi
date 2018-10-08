@@ -36,7 +36,6 @@ configure(bizWebProjects) {
         local {
 
             homeDir = localWebServerHome
-            timeout = 10000
 
             def jacocoAagentJar = new File("${jacocoDir}/jacocoagent.jar").path
             def jacocoReport = new File(reportsDir, 'jacoco/jacoco.exec').path
