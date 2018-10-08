@@ -64,40 +64,43 @@ class CopyExtended extends Copy {
 configure(bizBatchProjects){
 
     ext {
-        bizBatchProjectDistsDir = distsDir
+        intoRootDir = distsDir
     }
 
-    // シェルと設定ファイルをマスターにコピー
-    configure(dependProjects){
+     // シェルをコピー
+    task copyShells(type: CopyExtended) {
 
-         // シェルをコピー
-        task copyShells(type: CopyExtended) {
+        (dependProjects + project).each {
 
-            from "${projectDir}/${deployRootDir}/${shellDir}"
-
-            if(environment != envUt) {
-                from "${projectDir}/${deployRootDir}/${shellDir}_${environment}"
-            }
-
-            into "${bizBatchProjectDistsDir}/${deployRootDir}/${shellDir}"
-
-            include includeShells
-            presereveTimestamp()
-        }
-
-        // 設定ファイルをコピー
-        task copyConfs(type: CopyExtended) {
-
-            from "${projectDir}/${deployRootDir}/${confDir}"
+            from "${it.projectDir}/${deployRootDir}/${shellDir}"
 
             if(environment != envUt) {
-                from "${projectDir}/${deployRootDir}/${confDir}_${environment}"
+                from "${it.projectDir}/${deployRootDir}/${shellDir}_${environment}"
             }
-
-            into "${bizBatchProjectDistsDir}/${deployRootDir}/${confDir}"
-            include includeConfs
-            presereveTimestamp()
         }
+
+        into "${distsDir}/${deployRootDir}/${shellDir}"
+        include includeShells
+        presereveTimestamp()
+    }
+
+    // 設定ファイルをコピー
+    task copyConfs(type: CopyExtended) {
+
+        (dependProjects + project).each {
+
+            println "${it.projectDir}/${deployRootDir}/${confDir}"
+
+            from "${it.projectDir}/${deployRootDir}/${confDir}"
+
+            if(environment != envUt) {
+                from "${it.projectDir}/${deployRootDir}/${confDir}_${environment}"
+            }
+        }
+
+        into "${distsDir}/${deployRootDir}/${confDir}"
+        include includeConfs
+        presereveTimestamp()
     }
 
     // Jarをコピー
@@ -119,7 +122,7 @@ configure(bizBatchProjects){
     }
 
     // 配布リソースを圧縮
-    task zipDists(type: Zip)  {
+    task zipDists(type: Zip, dependsOn: [copyShells, copyConfs, copyJars])  {
 
         archiveName = distFilename
         from "${distsDir}/${deployRootDir}"
