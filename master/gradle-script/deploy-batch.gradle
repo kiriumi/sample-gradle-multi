@@ -61,15 +61,14 @@ class CopyExtended extends Copy {
     }
 }
 
-batchBizProjects.each { project("${it}") {
+configure(batchBizProjects){
 
     ext {
         batchBizProjectDistsDir = distsDir
     }
 
     // シェルと設定ファイルをマスターにコピー
-    (sharedProjectNames + project.name).each { project(":${it}") {
-
+    configure(dependProjects){
 
          // シェルをコピー
         task copyShells(type: CopyExtended) {
@@ -99,7 +98,7 @@ batchBizProjects.each { project("${it}") {
             include includeConfs
             presereveTimestamp()
         }
-    }}
+    }
 
     // Jarをコピー
     task copyJars << {
@@ -234,4 +233,4 @@ batchBizProjects.each { project("${it}") {
         tagName = branchName
         commitMessage = svnTagMessage
     }
-}}
+}

@@ -1,17 +1,30 @@
 // 拡張プロパティ
 ext{
     // プロジェクト一覧
+    /*
     sharedProjects = getProjectNames(containsStrsShared) // 共有プロジェクト
     batchProjects = getProjectNames(containsStrsBatch) // バッチプロジェクト
     onlineProjects = getProjectNames(containsStrsOnline) // オンラインプロジェクト
     batchBizProjects = batchProjects - sharedProjects // 業務バッチプロジェクト
     onlineBizProjects =  onlineProjects - sharedProjects // 業務オンラインプロジェクト
     bizProjects = batchBizProjects + onlineBizProjects // 業務プロジェクト
+    */
 
     // マスタープロジェクトのリソースディレクトリ
     masterResourcesDir = file('resources')
     checkstyleDir = file("${masterResourcesDir}/checkstyle")
     jacocoDir= file("${masterResourcesDir}/jacoco")
+
+
+    sharedProjects = getProjects(containsStrsShared) // 共有プロジェクト
+    batchProjects = getProjects(containsStrsBatch) // バッチプロジェクト
+    onlineProjects = getProjects(containsStrsOnline) // オンラインプロジェクト
+    batchBizProjects = batchProjects - sharedProjects // 業務バッチプロジェクト
+    onlineBizProjects =  onlineProjects - sharedProjects // 業務オンラインプロジェクト
+    bizProjects = batchBizProjects + onlineBizProjects // 業務プロジェクト
+
+
+
 }
 
 // 全プロジェクト共通
@@ -72,31 +85,30 @@ subprojects{
 }
 
 // 業務プロジェクト共通
-bizProjects.each { project(":${it}") {
+configure(bizProjects) {
 
     ext {
-        sharedProjectNames = sharedProjectNames.split()
+        dependProjects = getProjects(dependProjectNames)
     }
-
     // 依存関係
     dependencies {
 
-        sharedProjectNames.each{ compile project(":${it}") } // 共有プロジェクト
+        dependProjects.name.each{ compile project(":${it}") } // 共有プロジェクト
         runtime files("${deployRootDir}/${confDir}") // 外部リソースのクラスパス
     }
-}}
+}
 
 // 業務バッチプロジェクト共通
-batchBizProjects.each { project(":${it}") {
+configure(bizProjects) {
 
     // 依存関係
     dependencies {
 
     }
-}}
+}
 
 // 業務Webプロジェクト共通
-onlineBizProjects.each { project(":${it}") {
+configure(onlineBizProjects) {
 
     apply plugin: 'war'
     apply plugin: 'eclipse-wtp'
@@ -107,7 +119,7 @@ onlineBizProjects.each { project(":${it}") {
 
         testCompile group: 'com.codeborne', name: 'selenide', version: '4.14.2'
     }
-}}
+}
 
 // 対象のプロジェクト名一覧を取得
 def getProjectNames(containsStrs) {
@@ -115,6 +127,16 @@ def getProjectNames(containsStrs) {
     return subprojects.name.findAll {
 
         def projectName = it
+        containsStrs.split().any { projectName.contains(it) }
+    }
+}
+
+// 対象のプロジェクト名一覧を取得
+def getProjects(containsStrs) {
+
+    return subprojects.findAll {
+
+        def projectName = it.name
         containsStrs.split().any { projectName.contains(it) }
     }
 }
