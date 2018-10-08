@@ -72,41 +72,38 @@ subprojects{
 }
 
 // 業務プロジェクト共通
-bizProjects.each {
+bizProjects.each { project(":${it}") {
 
-    project(":${it}") {
+    // 依存関係
+    dependencies {
 
-        // 依存関係
-        dependencies {
-            runtime files("${deployRootDir}/${confDir}") // 外部リソースのクラスパス
-        }
+        runtime files("${deployRootDir}/${confDir}") // 外部リソースのクラスパス
     }
-}
+}}
+
+// 業務バッチプロジェクト共通
+batchBizProjects.each { project(":${it}") {
+
+    // 依存関係
+    dependencies {
+
+        compile project(':sample-gradle-multi-shared')
+    }
+}}
 
 // 業務Webプロジェクト共通
-onlineBizProjects.each {
+onlineBizProjects.each { project(":${it}") {
 
-    project(":${it}") {
+    apply plugin: 'war'
+    apply plugin: 'eclipse-wtp'
 
-        apply plugin: 'war'
-        apply plugin: 'eclipse-wtp'
+    dependencies {
 
-        ext {
-            localWebServerHome = new File(rootProject.projectDir, "web-server/$webServerHome")
-            localWebServerLibDir = new File(localWebServerHome, webServerLibDir)
-        }
+        compile project(':sample-gradle-multi-shared')
 
-        dependencies {
-
-            compile project(':sample-gradle-multi-shared')
-
-            compile group: 'com.codeborne', name: 'selenide', version: '4.14.2'
-            providedCompile fileTree(dir: localWebServerLibDir, include: 'java*/**/*.jar')
-        }
-
-        eclipse.wtp.component { contextPath  = contextPath }
+        testCompile group: 'com.codeborne', name: 'selenide', version: '4.14.2'
     }
-}
+}}
 
 // 対象のプロジェクト名一覧を取得
 def getProjectNames(containsStrs) {
