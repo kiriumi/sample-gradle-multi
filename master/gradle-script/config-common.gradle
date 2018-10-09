@@ -1,9 +1,9 @@
 // 拡張プロパティ
 ext{
     // プロジェクト一覧
-    sharedProjects = getProjectsByWords(wordsSharedProject) // 共有プロジェクト
-    batchProjects = getProjectsByWords(wordsBatchProject) // バッチプロジェクト
-    webProjects = getProjectsByWords(wordsWebProject) // オンラインプロジェクト
+    sharedProjects = getProjectsByWords(keywordsSharedProject) // 共有プロジェクト
+    batchProjects = getProjectsByWords(keywordsBatchProject) // バッチプロジェクト
+    webProjects = getProjectsByWords(keywordsWebProject) // オンラインプロジェクト
     bizBatchProjects = batchProjects - sharedProjects // 業務バッチプロジェクト
     bizWebProjects =  webProjects - sharedProjects // 業務オンラインプロジェクト
     bizProjects = bizBatchProjects + bizWebProjects // 業務プロジェクト
