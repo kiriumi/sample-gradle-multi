@@ -9,6 +9,7 @@ configure(bizWebProjects) {
     apply plugin: "com.bmuschko.cargo"
 
     ext {
+        // ローカルWebサーバ情報
         localWebServerHome = new File(rootProject.projectDir, "web-server/$webServerHome")
         localWebServerLibDir = new File(localWebServerHome, webServerLibDir)
     }
@@ -38,10 +39,9 @@ configure(bizWebProjects) {
             homeDir = localWebServerHome
 
             def jacocoAagentJar = new File("${jacocoDir}/jacocoagent.jar").path
-            def jacocoReport = new File(reportsDir, 'jacoco/jacoco.exec').path
 
             jvmArgs = "-Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true "
-            jvmArgs += "-javaagent:${jacocoAagentJar}=destfile=${jacocoReport},append=false,excludes=**/Test*.class:**/*Test.class"
+            jvmArgs += "-javaagent:${jacocoAagentJar}=destfile=${jacocoReportFile.path},append=false,excludes=**/Test*.class:**/*Test.class"
         }
 
         remote {

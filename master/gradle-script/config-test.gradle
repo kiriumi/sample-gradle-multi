@@ -9,6 +9,10 @@ subprojects{
     apply plugin: 'com.github.spotbugs'
     apply plugin: 'jacoco'
 
+    ext {
+        jacocoReportFile = file("${reportsDir}/jacoco/jacoco.exec")
+    }
+
     // 依存関係
     dependencies {
 
@@ -37,7 +41,7 @@ subprojects{
         jacoco {
 
             append = false
-            destinationFile = file("${reportsDir}/jacoco/jacoco.exec")
+            destinationFile = jacocoReportFile
         }
     }
 }
