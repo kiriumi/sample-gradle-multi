@@ -3,6 +3,15 @@
  * ・実行タスク：cleanDb migrateDb
  *
  */
+allprojects {
+
+    dependencies {
+
+       // DBクリーンタスクが使用するため、全プロジェクト共通
+       compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    }
+}
+
 subprojects {
 
     apply plugin: 'org.flywaydb.flyway'

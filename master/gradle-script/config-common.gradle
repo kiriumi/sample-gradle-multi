@@ -1,9 +1,9 @@
 // 拡張プロパティ
 ext{
     // プロジェクト一覧
-    sharedProjects = getProjectsByWords(keywordsSharedProject) // 共有プロジェクト
-    batchProjects = getProjectsByWords(keywordsBatchProject) // バッチプロジェクト
-    webProjects = getProjectsByWords(keywordsWebProject) // オンラインプロジェクト
+    sharedProjects = getProjects(keywordsSharedProject) // 共有プロジェクト
+    batchProjects = getProjects(keywordsBatchProject) // バッチプロジェクト
+    webProjects = getProjects(keywordsWebProject) // オンラインプロジェクト
     bizBatchProjects = batchProjects - sharedProjects // 業務バッチプロジェクト
     bizWebProjects =  webProjects - sharedProjects // 業務オンラインプロジェクト
     bizProjects = bizBatchProjects + bizWebProjects // 業務プロジェクト
@@ -28,8 +28,7 @@ allprojects {
 
     // 依存関係
     dependencies {
-        // DBマイグレーションのDBクリーンタスクが使用するため、全プロジェクト共通
-        compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+
     }
 
     repositories {
@@ -75,7 +74,8 @@ subprojects{
 configure(bizProjects) {
 
     ext {
-        dependProjects = getProjectsByWords(dependProjectNames)
+        // 依存する共有プロジェクト
+        dependProjects = getProjects(dependProjectNames)
     }
 
     // 依存関係
@@ -111,7 +111,7 @@ configure(bizWebProjects) {
 }
 
 // 対象のプロジェクト一覧を取得
-def getProjectsByWords(keywords) {
+def getProjects(keywords) {
 
     return subprojects.findAll {
 
