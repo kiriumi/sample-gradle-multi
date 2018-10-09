@@ -1,6 +1,6 @@
 /*
  * 共有プロジェクトをビルドし、Mavenリポジトリにアップロードする
- * ・実行タスク：clean build afterBuild uploadArchives
+ * ・実行タスク：clean build uploadArchives
  *
  */
 // 共有プロジェクト共通
