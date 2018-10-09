@@ -25,6 +25,7 @@ subprojects {
 
     checkstyle {
 
+        toolVersion = '8.13' // Gradleラッパーの場合、バージョンを指定しないとエラーになる
         configFile = file("${checkstyleDir}/${checkstyleConfigFile}")
         ignoreFailures = true
     }
