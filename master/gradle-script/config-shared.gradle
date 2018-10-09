@@ -19,7 +19,7 @@ configure(sharedProjects) {
         deployerJars 'org.apache.maven.wagon:wagon-ssh:2.2'
     }
 
-    // ソースJar作成
+    // ソースのJar作成
     task sourcesJar(type: Jar) {
 
         classifier = 'sources'
@@ -40,9 +40,10 @@ configure(sharedProjects) {
         archives javadocJar
     }
 
-   task afterBuild(dependsOn: [sourcesJar, javadocJar])
-
+    // Mavenリポジトリへのアップロード
     uploadArchives {
+
+        dependsOn = [sourcesJar, javadocJar]
 
         repositories.mavenDeployer {
 
