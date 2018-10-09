@@ -12,6 +12,15 @@ public class Library {
 
     public boolean someLibraryMethod() {
 
+        String hoge = null;
+
+        if (hoge == null) {
+
+            if (hoge == null) {
+                logger.info("SpotBugs検知箇所");
+            }
+        }
+
         logger.info("Shared開始");
 
         return true;
