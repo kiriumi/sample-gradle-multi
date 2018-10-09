@@ -1,9 +1,9 @@
 // 拡張プロパティ
 ext{
     // プロジェクト一覧
-    sharedProjects = getProjects(containsStrsShared) // 共有プロジェクト
-    batchProjects = getProjects(containsStrsBatch) // バッチプロジェクト
-    webProjects = getProjects(containsStrsWeb) // オンラインプロジェクト
+    sharedProjects = getProjectsByWords(wordsSharedProject) // 共有プロジェクト
+    batchProjects = getProjectsByWords(wordsBatchProject) // バッチプロジェクト
+    webProjects = getProjectsByWords(wordsWebProject) // オンラインプロジェクト
     bizBatchProjects = batchProjects - sharedProjects // 業務バッチプロジェクト
     bizWebProjects =  webProjects - sharedProjects // 業務オンラインプロジェクト
     bizProjects = bizBatchProjects + bizWebProjects // 業務プロジェクト
@@ -75,7 +75,7 @@ subprojects{
 configure(bizProjects) {
 
     ext {
-        dependProjects = getProjects(dependProjectNames)
+        dependProjects = getProjectsByWords(dependProjectNames)
     }
 
     // 依存関係
@@ -111,12 +111,12 @@ configure(bizWebProjects) {
     }
 }
 
-// 対象のプロジェクト名一覧を取得
-def getProjects(containsStrs) {
+// 対象のプロジェクト一覧を取得
+def getProjectsByWords(keywords) {
 
     return subprojects.findAll {
 
         def projectName = it.name
-        containsStrs.split().any { projectName.contains(it) }
+        keywords.split().any { projectName.contains(it) }
     }
 }
