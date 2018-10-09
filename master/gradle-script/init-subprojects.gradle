@@ -16,7 +16,7 @@ subprojects {
     }
 
     // ソースディレクトリの作成
-    task makeSourceDir << {
+    task makeSourceDirs << {
 
         // javaのソースディレクトリ作成（パッケージを含む）
         def makePackages = { javaSet ->
@@ -35,7 +35,7 @@ subprojects {
     }
 
     // 各種ディレクトリの作成
-    task makeDirs << {
+    task makeOtherDirs << {
 
         // DBマイグレーションSQLのディレクトリ
         makeDirIfNotExist(new File(projectDir, dbMigreSqlDir))
@@ -52,7 +52,7 @@ subprojects {
         }
     }
 
-    task initSubprojects(dependsOn: [makeSourceDir, makeDirs])
+    task initSubprojects(dependsOn: [makeSourceDirs, makeOtherDirs])
 }
 
 // ディレクトリ作成
