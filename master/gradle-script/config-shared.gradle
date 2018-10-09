@@ -43,8 +43,6 @@ configure(sharedProjects) {
     // Mavenリポジトリへのアップロード
     uploadArchives {
 
-        dependsOn = [sourcesJar, javadocJar]
-
         repositories.mavenDeployer {
 
             // ローカルのMavenリポジトリ
