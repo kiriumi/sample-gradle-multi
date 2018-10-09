@@ -7,12 +7,12 @@
  apply plugin: 'at.bxm.svntools'
 
 ext {
-    none = ['none']
-    // マスタープロジェクトに集約する配布リソース情報
+
+    // 配布リソース情報
     distFilename = String.format("${deployRootDir}-%s.zip", new Date().format('yyyyMMdd'))
 
-    // デプロイしたリソースの差分比較用ディレクトリ
-    diffDeploiedDir= "${projectDir}/diff-deploied"
+    // デプロイリ対象リソースの指定がない場合のダミーファイル名
+    none = ['71f8e7976e4cbc4561c9d62fb283e7f788202acb'] // 「none」をsha1でハッシュ化した値
 
     // デプロイ対象リソース
     includeShells = getAsArray(deployShells)
@@ -26,27 +26,27 @@ ext {
     removeJars = getAsJarArray(deleteJars)
     removeDependencies = getAsJarArray(deleteDependencies)
 
-    // 指定された環境がUTか判定
-    isUt = (environment == envUt)
+    // デプロイしたリソースの差分比較用ディレクトリ
+    diffDeploiedDir= "${projectDir}/diff-deploied"
 }
 
 // プロパティファイルで指定されたリソースを配列にする
-// ※空文字の場合は、空振りさせるためnoneを返す
 def getAsArray(targets) {
 
     return targets.trim().isEmpty() ? none : targets.split()
 }
 
 // プロパティファイルで指定されたJarを配列にする
-// ※空文字の場合は、空振りさせるためnoneを返す
 def getAsJarArray(targetJars) {
 
     return targetJars.trim().isEmpty() ? none : targetJars.split().collect{ "${it}-*.jar" }
 }
 
 // 拡張コピータスククラス
+//   ※更新日時を維持するメソッドを追加
 class CopyExtended extends Copy {
 
+    // 更新日時を維持する
     def presereveTimestamp() {
 
         def copyFileDetailses = []
@@ -61,11 +61,7 @@ class CopyExtended extends Copy {
     }
 }
 
-configure(bizBatchProjects){
-
-    ext {
-        intoRootDir = distsDir
-    }
+configure(bizBatchProjects) {
 
      // シェルをコピー
     task copyShells(type: CopyExtended) {
@@ -136,6 +132,7 @@ configure(bizBatchProjects){
     // サーバ接続情報
     remotes {
 
+        // 配布リソースの転送ユーザ
         transferer {
             host = deployHost
             user = deployUser
@@ -143,6 +140,7 @@ configure(bizBatchProjects){
 
         }
 
+        // 配布リソースのデプロイユーザ
         deployer {
             host = deployHost
             user = deployUser
