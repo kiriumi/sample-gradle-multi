@@ -47,12 +47,9 @@ subprojects {
 
     pmdTest.excludes = ['**/*']
 
-    test {
+    jacoco {
 
-        jacoco {
-
-            append = false
-            destinationFile = jacocoReportFile
-        }
+        append = false
+        destinationFile = jacocoReportFile
     }
 }
