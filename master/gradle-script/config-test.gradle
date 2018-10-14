@@ -51,8 +51,8 @@ subprojects {
 
         jacoco {
 
-            toolVersion = '0.7.5.+'
-            append = false
+            //append = false
+            excludes = ['**/*Test*']
             destinationFile = jacocoReportFile
         }
     }
