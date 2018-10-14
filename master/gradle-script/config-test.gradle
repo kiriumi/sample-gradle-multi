@@ -47,9 +47,13 @@ subprojects {
 
     pmdTest.excludes = ['**/*']
 
-    jacoco {
+    test {
 
-        append = false
-        destinationFile = jacocoReportFile
+        jacoco {
+
+            toolVersion = '0.7.5.+'
+            append = false
+            destinationFile = jacocoReportFile
+        }
     }
 }
