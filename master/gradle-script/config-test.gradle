@@ -51,7 +51,7 @@ subprojects {
 
         jacoco {
 
-            //append = false
+            append = false
             excludes = ['**/*Test*']
             destinationFile = jacocoReportFile
         }
