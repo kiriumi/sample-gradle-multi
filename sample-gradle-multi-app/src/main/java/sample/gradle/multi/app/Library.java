@@ -17,9 +17,14 @@ public class Library {
         if (hoge == null) {
 
             if (hoge == null) {
-                logger.info("SpotBugs検知箇所");
+                logger.info("SpotBugs検知");
             }
         }
+
+        // TODO:ToDo
+        // FIXME:バグ対応が必要
+        // XXX:基本的には不具合だが、正常ケースで問題が起きないモノ
+        System.out.println("TaskScannerで検知");
 
         logger.info("App開始");
 
