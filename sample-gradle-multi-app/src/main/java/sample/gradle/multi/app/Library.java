@@ -26,6 +26,11 @@ public class Library {
         // XXX:基本的には不具合だが、正常ケースで問題が起きないモノ
         System.out.println("TaskScannerで検知");
 
+        // PMDで検知されるコード
+        if (true) {
+
+        }
+
         logger.info("App開始");
 
         return true;

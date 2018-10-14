@@ -8,6 +8,7 @@ subprojects {
     apply plugin: 'checkstyle'
     apply plugin: 'com.github.spotbugs'
     apply plugin: 'jacoco'
+    apply plugin: 'pmd'
 
     ext {
         jacocoReportFile = file("${reportsDir}/jacoco/jacoco.exec")
@@ -38,6 +39,13 @@ subprojects {
     }
 
     spotbugsTest.excludes = ['**/*']
+
+    pmd {
+
+        ignoreFailures = true
+    }
+
+    pmdTest.excludes = ['**/*']
 
     test {
 
