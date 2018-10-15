@@ -10,7 +10,10 @@ configure(bizWebProjects) {
 
     ext {
         // ローカルWebサーバ情報
-        localWebServerHome = new File(rootProject.projectDir, "web-server/$webServerHome")
+        localWebServerHome = localWebServerDir == ''
+            ? new File(rootProject.projectDir, "web-server/${webServerHome}")
+            : new File("${localWebServerDir}/${webServerHome}")
+
         localWebServerLibDir = new File(localWebServerHome, webServerLibDir)
     }
 
