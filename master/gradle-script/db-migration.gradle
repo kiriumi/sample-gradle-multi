@@ -5,6 +5,11 @@
  */
 allprojects {
 
+    ext {
+        // SQLiteのDBファイルパス
+        jdbcUrl = String.format(jdbcUrl, rootProject.projectDir.path + "/database")
+    }
+
     dependencies {
 
        // DBクリーンタスクが使用するため、全プロジェクト共通

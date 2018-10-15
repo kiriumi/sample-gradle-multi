@@ -19,6 +19,8 @@ public class DbTest {
 
     protected static final String TEST_RESOURCES_PATH = "./src/test/resources/";
     protected static final String DBUNIT_SQL_PATH = TEST_RESOURCES_PATH + "dbunit/";
+    protected static final File DB_FILE = new File(
+            new File("").getAbsoluteFile().getParent(), "/master/database/sample01.sqlite");
 
     private static IDatabaseTester databaseTester;
     private static IDatabaseConnection connection;
@@ -71,11 +73,11 @@ public class DbTest {
     private static void setupConnection() throws ClassNotFoundException, Exception {
 
         databaseTester = new JdbcDatabaseTester(
-                "org.postgresql.Driver",
-                "jdbc:postgresql://localhost:5432/spring_batch_db",
-                "springrole",
-                "springrole",
-                "flyway1");
+                "org.sqlite.JDBC",
+                "jdbc:sqlite:" + DB_FILE.getAbsolutePath(),
+                "",
+                "",
+                "");
 
         connection = databaseTester.getConnection();
     }
