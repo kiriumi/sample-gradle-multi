@@ -28,8 +28,9 @@ classes
 ################
 bin
 .settings
-.classpath
 .project
+.classpath
+.checkstyle
 
 # STS (Spring Tool Suite)
 .springBeans
