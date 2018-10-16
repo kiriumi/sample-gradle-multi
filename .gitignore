@@ -1,17 +1,25 @@
 ################
-#  General
+#  Log
 ################
 *.log
+
+################
+#  Archives
+################
 *.zip
+*.7z
+*.lha
+*.rar
+*.cab
 *.tar
 *.gz
-*.rar
+*.gzip
 
 ################
 #  Java
 ################
+classes
 *.class
-*.jar
 *.war
 *.ear
 
@@ -34,16 +42,5 @@ target
 ################
 #  Gradle
 ################
-.gradle
 build
-!gradle
-
-################
-#  Local Web Server
-################
-!web-server
-
-################
-#  Jacoco
-################
-!jacocoagent.jar
+.gradle
