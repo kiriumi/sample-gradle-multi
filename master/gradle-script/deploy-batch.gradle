@@ -85,8 +85,6 @@ configure(bizBatchProjects) {
 
         (dependProjects + project).each {
 
-            println "${it.projectDir}/${deployRootDir}/${confDir}"
-
             from "${it.projectDir}/${deployRootDir}/${confDir}"
 
             if(environment != envUt) {
