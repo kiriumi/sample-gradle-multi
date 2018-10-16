@@ -20,7 +20,7 @@ public class DbTest {
     protected static final String TEST_RESOURCES_PATH = "./src/test/resources/";
     protected static final String DBUNIT_SQL_PATH = TEST_RESOURCES_PATH + "dbunit/";
     protected static final File DB_FILE = new File(
-            new File("").getAbsoluteFile().getParent(), "/master/database/sample01.sqlite");
+            new File("").getAbsoluteFile().getParent(), "/master/database/sample.sqlite");
 
     private static IDatabaseTester databaseTester;
     private static IDatabaseConnection connection;
