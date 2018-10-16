@@ -10,6 +10,8 @@ allprojects {
     // Eclipseの.project設定
     eclipse.project {
 
+        println new Date()
+
         name = project.name
         buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
         natures 'org.eclipse.buildship.core.gradleprojectnature'
@@ -18,29 +20,35 @@ allprojects {
     // Eclipseプロジェクトの文字コード設定
     eclipseJdt << {
 
-        File f = file('.settings/org.eclipse.core.resources.prefs')
-        f.write('eclipse.preferences.version=1\n')
-        f.append('encoding/<project>=UTF-8')
+        File prefs = file('.settings/org.eclipse.core.resources.prefs')
+        prefs.write('''
+            eclipse.preferences.version=1
+            encoding/<project>=UTF-8
+            '''.stripIndent())
     }
 
     // Eclipseプロジェクトの改行コード設定
     eclipseJdt << {
 
-        File file = file('.settings/org.eclipse.core.runtime.prefs')
-        file.write('eclipse.preferences.version=1\n')
-        file.append('line.separator=\\n\n')
+        File prefs = file('.settings/org.eclipse.core.runtime.prefs')
+        prefs.write('''
+            eclipse.preferences.version=1
+            line.separator=\\n
+            '''.stripIndent())
     }
 
     // Buildshipの設定
     eclipseJdt << {
 
-        File file = file('.settings/org.eclipse.buildship.core.prefs')
-        file.write('override.workspace.settings=true\n')
-        file.append('connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)\n')
-        file.append('gradle.user.home=\n')
-        file.append('connection.project.dir=\n')
-        file.append('offline.mode=false\n')
-        file.append('build.scans.enabled=false\n')
+        File prefs = file('.settings/org.eclipse.buildship.core.prefs')
+        prefs.write('''
+            override.workspace.settings=true
+            connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
+            gradle.user.home=
+            connection.project.dir=
+            offline.mode=false
+            build.scans.enabled=false
+            '''.stripIndent())
     }
 }
 
