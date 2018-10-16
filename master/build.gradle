@@ -36,11 +36,11 @@ ext{
 }
 
 // 外部Gradleスクリプトの適用
-def gradleScriptDir = 'gradle-script'
-apply from: "${gradleScriptDir}/config-common.gradle" // プロジェクトの共通設定
-apply from: "${gradleScriptDir}/config-shared.gradle" // 共有プロジェクトの設定
-apply from: "${gradleScriptDir}/config-test.gradle" // テストの共通設定
-apply from: "${gradleScriptDir}/init-subprojects.gradle" // サブプロジェクトの初期化
-apply from: "${gradleScriptDir}/db-migration.gradle" // DBマイグレーション
-apply from: "${gradleScriptDir}/deploy-batch.gradle" // バッチデプロイ
-apply from: "${gradleScriptDir}/deploy-web.gradle" // Webデプロイ
+def gradleScriptsDir = 'gradle-scripts'
+apply from: "${gradleScriptsDir}/config-common.gradle" // プロジェクトの共通設定
+apply from: "${gradleScriptsDir}/config-shared.gradle" // 共有プロジェクトの設定
+apply from: "${gradleScriptsDir}/config-test.gradle" // テストの共通設定
+apply from: "${gradleScriptsDir}/init-projects.gradle" // サブプロジェクトの初期化
+apply from: "${gradleScriptsDir}/db-migration.gradle" // DBマイグレーション
+apply from: "${gradleScriptsDir}/deploy-batch.gradle" // バッチデプロイ
+apply from: "${gradleScriptsDir}/deploy-web.gradle" // Webデプロイ

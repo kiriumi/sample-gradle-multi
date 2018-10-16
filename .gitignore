@@ -1,17 +1,25 @@
 ################
-#  General
+#  Log
 ################
 *.log
+
+################
+#  Archives
+################
 *.zip
+*.7z
+*.lha
+*.rar
+*.cab
 *.tar
 *.gz
-*.rar
+*.gzip
 
 ################
 #  Java
 ################
+classes
 *.class
-*.jar
 *.war
 *.ear
 
@@ -20,7 +28,9 @@
 ################
 bin
 .settings
+.project
 .classpath
+.checkstyle
 
 # STS (Spring Tool Suite)
 .springBeans
@@ -29,21 +39,9 @@ bin
 #  Maven
 ################
 target
-pom.xml
 
 ################
 #  Gradle
 ################
-.gradle
 build
-!gradle
-
-################
-#  Local Web Server
-################
-!web-server
-
-################
-#  Jacoco
-################
-!jacocoagent.jar
+.gradle

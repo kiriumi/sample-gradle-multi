@@ -7,7 +7,7 @@ allprojects {
 
     ext {
         // SQLiteのDBファイルパス
-        jdbcUrl = String.format(jdbcUrl, rootProject.projectDir.path + "/database")
+        jdbcUrl = String.format(jdbcUrl, rootProject.projectDir.path)
     }
 
     dependencies {
