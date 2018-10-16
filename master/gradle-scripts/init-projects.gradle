@@ -10,6 +10,8 @@ allprojects {
     // Eclipseの.project設定
     eclipse.project {
 
+        println new Date()
+
         name = project.name
         buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
         natures 'org.eclipse.buildship.core.gradleprojectnature'
@@ -21,8 +23,8 @@ allprojects {
         File prefs = file('.settings/org.eclipse.core.resources.prefs')
         prefs.write('''
             eclipse.preferences.version=1
-            encoding/<project>=UTF-8'''
-            .stripIndent())
+            encoding/<project>=UTF-8
+            '''.stripIndent())
     }
 
     // Eclipseプロジェクトの改行コード設定
@@ -31,8 +33,8 @@ allprojects {
         File prefs = file('.settings/org.eclipse.core.runtime.prefs')
         prefs.write('''
             eclipse.preferences.version=1
-            line.separator=\\n'''
-            .stripIndent())
+            line.separator=\\n
+            '''.stripIndent())
     }
 
     // Buildshipの設定
@@ -45,8 +47,8 @@ allprojects {
             gradle.user.home=
             connection.project.dir=
             offline.mode=false
-            build.scans.enabled=false'''
-            .stripIndent())
+            build.scans.enabled=false
+            '''.stripIndent())
     }
 }
 
