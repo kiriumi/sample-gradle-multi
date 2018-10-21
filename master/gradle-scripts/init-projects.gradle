@@ -7,47 +7,65 @@ allprojects {
 
     apply plugin: 'eclipse'
 
-    // Eclipseの.project設定
-    eclipse.project {
+    ext {
 
-        name = project.name
-        buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
-        natures 'org.eclipse.buildship.core.gradleprojectnature'
+        doEclipse = {
+
+            tasks.cleanEclipseClasspath.execute()
+            tasks.cleanEclipseJdt.execute()
+            tasks.cleanEclipseProject.execute()
+
+            tasks.eclipseJdt.execute()
+            tasks.eclipseProject.execute()
+        }
     }
 
-    // Eclipseプロジェクトの文字コード設定
-    eclipseJdt << {
-
-        File prefs = file('.settings/org.eclipse.core.resources.prefs')
-        prefs.write('''
-            eclipse.preferences.version=1
-            encoding/<project>=UTF-8
-            '''.stripIndent())
+    dependencies {
+        doEclipse()
     }
 
-    // Eclipseプロジェクトの改行コード設定
-    eclipseJdt << {
+    eclipse {
 
-        File prefs = file('.settings/org.eclipse.core.runtime.prefs')
-        prefs.write('''
-            eclipse.preferences.version=1
-            line.separator=\\n
-            '''.stripIndent())
+        // .project設定
+        project{
+
+            name = project.name
+            buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
+            natures 'org.eclipse.buildship.core.gradleprojectnature'
+        }
+
+        jdt {
+            // 文字コード
+            file('.settings/org.eclipse.core.resources.prefs').write("""
+                eclipse.preferences.version=1
+                encoding/<project>=${encoding}
+                """.stripIndent())
+
+             // 改行コード
+             file('.settings/org.eclipse.core.runtime.prefs').write("""
+                eclipse.preferences.version=1
+                line.separator=${lineSeparator}
+                """.stripIndent())
+        }
     }
 
+
+
+/*
     // Buildshipの設定
-    eclipseJdt << {
+    eclipseJdt {
 
         File prefs = file('.settings/org.eclipse.buildship.core.prefs')
-        prefs.write('''
+        prefs.write("""
             override.workspace.settings=true
             connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
             gradle.user.home=
             connection.project.dir=
             offline.mode=false
             build.scans.enabled=false
-            '''.stripIndent())
+            """.stripIndent())
     }
+    */
 }
 
 subprojects {
