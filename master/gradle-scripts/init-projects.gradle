@@ -55,7 +55,7 @@ eclipse {
     jdt {
          // Buildship
          file('.settings/org.eclipse.buildship.core.prefs').write("""
-            eclipse.preferences.version=1
+            connection.project.dir=
             override.workspace.settings=true
             connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
             gradle.user.home=
