@@ -1,6 +1,0 @@
-connection.project.dir=
-override.workspace.settings=true
-connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
-gradle.user.home=
-offline.mode=false
-build.scans.enabled=false
