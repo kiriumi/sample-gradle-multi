@@ -1,4 +1,3 @@
-
 override.workspace.settings=true
 connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
 gradle.user.home=
