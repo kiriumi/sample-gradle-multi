@@ -7,25 +7,6 @@ allprojects {
 
     apply plugin: 'eclipse'
 
-    ext {
-
-        doEclipse = {
-
-            tasks.cleanEclipseClasspath.execute()
-            tasks.cleanEclipseJdt.execute()
-            tasks.cleanEclipseProject.execute()
-
-            tasks.eclipseJdt.execute()
-            tasks.eclipseProject.execute()
-        }
-    }
-
-/*
-    dependencies {
-        doEclipse()
-    }
-*/
-
     eclipse {
 
         // .project設定
