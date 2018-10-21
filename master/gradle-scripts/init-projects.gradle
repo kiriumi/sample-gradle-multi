@@ -35,36 +35,37 @@ allprojects {
             buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
             natures 'org.eclipse.buildship.core.gradleprojectnature'
         }
-
-        jdt {
-            // 文字コード
-            file('.settings/org.eclipse.core.resources.prefs').write("""
-                encoding/<project>=${encoding}
-                """.stripIndent())
-
-             // 改行コード
-             file('.settings/org.eclipse.core.runtime.prefs').write("""
-                line.separator=${lineSeparator}
-                """.stripIndent())
-        }
     }
-}
 
-eclipse {
+    eclipseJdt << {
 
-    jdt {
-         // Buildship
-         file('.settings/org.eclipse.buildship.core.prefs').write("""
-            connection.project.dir=
-            override.workspace.settings=true
-            connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
-            gradle.user.home=
-            offline.mode=false
-            build.scans.enabled=false
+        // 文字コード
+        file('.settings/org.eclipse.core.resources.prefs').write("""
+            encoding/<project>=${encoding}
+            """.stripIndent())
+
+         // 改行コード
+         file('.settings/org.eclipse.core.runtime.prefs').write("""
+            line.separator=${lineSeparator}
             """.stripIndent())
     }
 }
 
+// masterプロジェクト
+eclipseJdt << {
+
+     // Buildship
+     file('.settings/org.eclipse.buildship.core.prefs').write("""
+        connection.project.dir=
+        override.workspace.settings=true
+        connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
+        gradle.user.home=
+        offline.mode=false
+        build.scans.enabled=false
+        """.stripIndent())
+}
+
+// サブプロジェクト
 subprojects {
 
     ext {
