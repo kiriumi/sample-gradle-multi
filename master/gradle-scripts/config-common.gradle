@@ -19,6 +19,14 @@ allprojects {
 
     apply plugin: 'java'
 
+	// 拡張プロパティ
+    ext {
+
+        javaVersion = '1.8'
+        encoding = 'UTF-8'
+        lineSeparator = '\\n'
+    }
+
     // 設定
     configurations.all {
         // 依存関係のローカルキャッシュ無効化（「changing: true」を対象の依存関係の付与する）
@@ -44,9 +52,6 @@ subprojects{
 
     group = "${baseGroupId}.${groupId}"
     version = "${branchName}.${environment}"
-
-    def javaVersion = '1.8'
-    def encoding = 'UTF-8'
 
     compileJava {
 
