@@ -77,7 +77,7 @@ configure(bizProjects) {
     // 依存関係
     dependencies {
 
-        dependProjects.name.each{ api project(":${it}") } // 共有プロジェクト
+        dependProjects.name.each{ implementation project(":${it}") } // 共有プロジェクト
         implementation files("${deployRootDir}/${confDir}") // 外部リソースのクラスパス
     }
 }
