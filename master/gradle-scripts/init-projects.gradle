@@ -18,7 +18,7 @@ allprojects {
         }
     }
 
-    eclipseJdt << {
+    eclipseJdt { doLast {
 
         // 文字コード
         file('.settings/org.eclipse.core.resources.prefs').write("""
@@ -29,11 +29,11 @@ allprojects {
          file('.settings/org.eclipse.core.runtime.prefs').write("""
             line.separator=${lineSeparator}
             """.stripIndent())
-    }
+    }}
 }
 
 // masterプロジェクト
-eclipseJdt << {
+eclipseJdt { doLast {
 
      // Buildship
      file('.settings/org.eclipse.buildship.core.prefs').write("""
@@ -44,7 +44,7 @@ eclipseJdt << {
         offline.mode=false
         build.scans.enabled=false
         """.stripIndent())
-}
+}}
 
 // サブプロジェクト
 subprojects {
@@ -58,15 +58,17 @@ subprojects {
     }
 
     // ソースディレクトリの作成
-    task makeSourceDirs << {
+    task makeSourceSetsDirs doLast {
 
         // javaのソースディレクトリ作成（パッケージを含む）
         def makePackages = { javaSet ->
+
             javaSet.srcDirs.each { makeDirIfNotExist(new File(it, packagePath)) }
         }
 
         // resoucesのソースディレクトリ作成
         def makeResourceDir = { resourceSet ->
+
             resourceSet.srcDirs.each { makeDirIfNotExist(it) }
         }
 
@@ -77,7 +79,7 @@ subprojects {
     }
 
     // 各種ディレクトリの作成
-    task makeOtherDirs << {
+    task makeMiscDirs doLast {
 
         // DBマイグレーションSQLのディレクトリ
         makeDirIfNotExist(new File(projectDir, dbMigreSqlDir))
@@ -94,7 +96,7 @@ subprojects {
         }
     }
 
-    task initSubprojects(dependsOn: [makeSourceDirs, makeOtherDirs])
+    task initSubprojects(dependsOn: [makeSourceSetsDirs, makeMiscDirs])
 }
 
 // ディレクトリ作成

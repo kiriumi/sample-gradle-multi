@@ -53,6 +53,7 @@ class CopyExtended extends Copy {
         eachFile { copyFileDetailses <<  it } // eachFileの実行タイミングはdoLastと同じ
 
         doLast {
+
             copyFileDetailses.each { copyFileDetails ->
                 def destFile = new File(destinationDir, copyFileDetails.path)
                 if(destFile.exists()) { destFile.setLastModified(copyFileDetails.lastModified) }
@@ -98,7 +99,7 @@ configure(bizBatchProjects) {
     }
 
     // Jarをコピー
-    task copyJars << {
+    task copyJars doLast {
 
         // 業務Jar
         copy {
@@ -147,7 +148,7 @@ configure(bizBatchProjects) {
     }
 
     // リソース削除
-    task deleteDeploied << {
+    task deleteDeploied doLast {
 
         ssh.run {
 
@@ -166,7 +167,7 @@ configure(bizBatchProjects) {
     }
 
     // デプロイ
-    task deployBatch(dependsOn: [zipDists, deleteDeploied]) << {
+    task deployBatch(dependsOn: [zipDists, deleteDeploied]) doLast {
 
         ssh.run {
 
@@ -220,7 +221,7 @@ configure(bizBatchProjects) {
     }
 
     // デプロイリソースをSVNにコミット
-    task commitDeploied(type: svnCommitTask, dependsOn: copyDeploied) {
+    task commitDeploied(type: svnCommitTask, dependsOn: copyDeploied) doLast {
 
         source <<  "${diffDeploiedDir}/${deployHost}"
         commitMessage = svnCommitDeploiedMessage
