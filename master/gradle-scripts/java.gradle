@@ -9,9 +9,9 @@ ext{
     bizProjects = bizBatchProjects + bizWebProjects // 業務プロジェクト
 
     // マスタープロジェクトのリソースディレクトリ
-    masterResourcesDir = file('resources')
-    checkstyleDir = file("${masterResourcesDir}/checkstyle")
-    jacocoDir= file("${masterResourcesDir}/jacoco")
+    masterMiscDir = file('misc')
+    checkstyleDir = file("${masterMiscDir}/checkstyle")
+    jacocoDir= file("${masterMiscDir}/jacoco")
 }
 
 // 全プロジェクト共通
@@ -97,12 +97,22 @@ configure(bizWebProjects) {
     apply plugin: 'war'
     apply plugin: 'eclipse-wtp'
 
+    ext {
+        // ローカルWebサーバ情報
+        localWebServerHome = localWebServerDir == ''
+            ? new File(rootProject.projectDir, "web-server/${webServerHome}")
+            : new File("${localWebServerDir}/${webServerHome}")
+
+        localWebServerLibDir = new File(localWebServerHome, webServerLibDir)
+    }
+
     // コンテキストパス
     eclipse.wtp.component { contextPath  = contextPath }
 
     // 依存関係
     dependencies {
 
+        providedCompile fileTree(dir: localWebServerLibDir, include: 'java*/**/*.jar')
     }
 }
 
