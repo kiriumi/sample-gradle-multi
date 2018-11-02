@@ -1,23 +1,12 @@
 /*
- * 共有プロジェクトをビルドし、Mavenリポジトリにアップロードする
- * ・実行タスク：clean build uploadArchives
+ * 共有プロジェクトを社内Mavenリポジトリにアップロードする
+ * ・実行タスク：publish
  *
  */
 // 共有プロジェクト共通
 configure(sharedProjects) {
 
-    apply plugin: 'maven'
-
-    // 設定
-    configurations {
-        deployerJars
-    }
-
-    // 依存関係
-    dependencies {
-
-        deployerJars 'org.apache.maven.wagon:wagon-ssh:2.2'
-    }
+    apply plugin: 'maven-publish'
 
     // ソースのJar作成
     task sourcesJar(type: Jar) {
@@ -33,32 +22,19 @@ configure(sharedProjects) {
         from javadoc.destinationDir
     }
 
-    // Mavenリポジトリへのアップロード対象に含める
-    artifacts {
+    // 成果物の公開
+    publishing {
 
-        archives sourcesJar
-        archives javadocJar
-    }
+        repositories { maven { url = innerMavenRepoUrl }}
 
-    // Mavenリポジトリへのアップロード
-    uploadArchives {
+        publications {
 
-        repositories.mavenDeployer {
+            mavenJava(MavenPublication) {
 
-            // ローカルのMavenリポジトリ
-            repository(url: innerMavenRepoUrl)
+                from components.java
 
-            configuration = configurations.deployerJars
-
-            if(!innerMavenRepoUploadUrl.trim().isEmpty()) {
-
-                 // 社内Mavenリポジトリ
-                repository(url: innerMavenRepoUploadUrl) {
-
-                    authentication(
-                        userName: innerMavenRepoUser,
-                        password: innerMavenRepoPassword)
-                }
+                artifact sourcesJar
+                artifact javadocJar
             }
         }
     }
