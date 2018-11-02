@@ -110,7 +110,8 @@ configure(bizBatchProjects) {
 
         // 依存Jar
         copy {
-            from configurations.compile
+
+            from configurations.compileClasspath
             into "${distsDir}/${deployRootDir}/${dependenciesDir}"
             include includeDependencies
         }
