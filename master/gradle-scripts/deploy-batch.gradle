@@ -149,7 +149,7 @@ configure(bizBatchProjects) {
         }
     }
 
-    // リソースの削除タスク
+    // 過去のデプロイリソース削除タスク
     task deleteDeploied doLast {
 
         ssh.run {
@@ -223,14 +223,14 @@ configure(bizBatchProjects) {
         password = svnPassword
     }
 
-    // デプロイリソースをSVNにコミット
+    // デプロイリソースのコミットタスク
     task commitDeploied(type: svnCommitTask, dependsOn: copyDeploied) doLast {
 
         source <<  "${diffDeploiedDir}/${deployHost}"
         commitMessage = svnCommitDeploiedMessage
     }
 
-    // デプロイ後にタグ付け
+    // タグ付けタスク
     task tagDeploied(type: svnTagTask) {
 
         tagName = branchName

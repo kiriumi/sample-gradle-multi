@@ -1,6 +1,6 @@
 /*
  * Jar, Warを作成する
- * ・実行タスク：publish
+ * ・実行タスク：clean build
  *
  */
 // 拡張プロパティ

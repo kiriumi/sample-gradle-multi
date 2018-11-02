@@ -31,7 +31,7 @@ configure(bizWebProjects) {
 
             def jacocoAagentJar = new File("${jacocoDir}/jacocoagent.jar").path
 
-            jvmArgs = "-Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true "
+            jvmArgs = '-Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true '
             jvmArgs += "-javaagent:${jacocoAagentJar}=destfile=${jacocoReportFile.path},append=false,excludes=**/Test*.class:**/*Test.class"
         }
 
