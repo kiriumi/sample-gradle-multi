@@ -1,5 +1,5 @@
 /*
- * バッチ関連のリソースをマスターに集約し、デプロイする
+ * バッチのリソースをマスターに集約し、デプロイする
  * ・実行タスク：clean deployBatch commitDeploied tagDeploied
  *
  */
@@ -43,7 +43,7 @@ def getAsJarArray(targetJars) {
 }
 
 // 拡張コピータスククラス
-//   ※更新日時を維持するメソッドを追加
+// ※更新日時を維持するメソッドを追加
 class CopyExtended extends Copy {
 
     // 更新日時を維持する
@@ -53,6 +53,7 @@ class CopyExtended extends Copy {
         eachFile { copyFileDetailses <<  it } // eachFileの実行タイミングはdoLastと同じ
 
         doLast {
+
             copyFileDetailses.each { copyFileDetails ->
                 def destFile = new File(destinationDir, copyFileDetails.path)
                 if(destFile.exists()) { destFile.setLastModified(copyFileDetails.lastModified) }
@@ -63,7 +64,7 @@ class CopyExtended extends Copy {
 
 configure(bizBatchProjects) {
 
-     // シェルをコピー
+     // シェルのコピータスク
     task copyShells(type: CopyExtended) {
 
         (dependProjects + project).each {
@@ -80,7 +81,7 @@ configure(bizBatchProjects) {
         presereveTimestamp()
     }
 
-    // 設定ファイルをコピー
+    // 設定ファイルのコピータスク
     task copyConfs(type: CopyExtended) {
 
         (dependProjects + project).each {
@@ -97,8 +98,8 @@ configure(bizBatchProjects) {
         presereveTimestamp()
     }
 
-    // Jarをコピー
-    task copyJars << {
+    // Jarのコピータスク
+    task copyJars doLast {
 
         // 業務Jar
         copy {
@@ -109,13 +110,14 @@ configure(bizBatchProjects) {
 
         // 依存Jar
         copy {
-            from configurations.compile
+
+            from configurations.compileClasspath
             into "${distsDir}/${deployRootDir}/${dependenciesDir}"
             include includeDependencies
         }
     }
 
-    // 配布リソースを圧縮
+    // 配布リソースの圧縮タスク
     task zipDists(type: Zip, dependsOn: [copyShells, copyConfs, copyJars])  {
 
         archiveName = distFilename
@@ -124,6 +126,7 @@ configure(bizBatchProjects) {
 
     // SSH共通設定　
     ssh.settings {
+
         knownHosts = allowAnyHosts
     }
 
@@ -146,8 +149,8 @@ configure(bizBatchProjects) {
         }
     }
 
-    // リソース削除
-    task deleteDeploied << {
+    // 過去のデプロイリソース削除タスク
+    task deleteDeploied doLast {
 
         ssh.run {
 
@@ -165,8 +168,8 @@ configure(bizBatchProjects) {
         }
     }
 
-    // デプロイ
-    task deployBatch(dependsOn: [zipDists, deleteDeploied]) << {
+    // デプロイタスク
+    task deployBatch(dependsOn: [zipDists, deleteDeploied]) doLast {
 
         ssh.run {
 
@@ -215,18 +218,19 @@ configure(bizBatchProjects) {
 
     // SVN接続情報
     svntools {
+
         username = svnUser
         password = svnPassword
     }
 
-    // デプロイリソースをSVNにコミット
-    task commitDeploied(type: svnCommitTask, dependsOn: copyDeploied) {
+    // デプロイリソースのコミットタスク
+    task commitDeploied(type: svnCommitTask, dependsOn: copyDeploied) doLast {
 
         source <<  "${diffDeploiedDir}/${deployHost}"
         commitMessage = svnCommitDeploiedMessage
     }
 
-    // デプロイ後にタグ付け
+    // タグ付けタスク
     task tagDeploied(type: svnTagTask) {
 
         tagName = branchName

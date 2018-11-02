@@ -21,7 +21,7 @@ subprojects {
 
     apply plugin: 'org.flywaydb.flyway'
 
-    // DBマイグレーション
+    // DBマイグレーションタスク
     task migrateDb(type: flywayMigrateTask) {
 
         driver = jdbcDriver
@@ -37,7 +37,7 @@ subprojects {
     }
 }
 
-// DBクリーン
+// DBクリーンタスク
 task cleanDb(type: flywayCleanTask) {
 
     driver = jdbcDriver

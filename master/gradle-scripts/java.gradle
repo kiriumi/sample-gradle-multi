@@ -1,3 +1,8 @@
+/*
+ * Jar, Warを作成する
+ * ・実行タスク：clean build
+ *
+ */
 // 拡張プロパティ
 ext{
     // プロジェクト一覧
@@ -7,51 +12,33 @@ ext{
     bizBatchProjects = batchProjects - sharedProjects // 業務バッチプロジェクト
     bizWebProjects =  webProjects - sharedProjects // 業務オンラインプロジェクト
     bizProjects = bizBatchProjects + bizWebProjects // 業務プロジェクト
-
-    // マスタープロジェクトのリソースディレクトリ
-    masterResourcesDir = file('resources')
-    checkstyleDir = file("${masterResourcesDir}/checkstyle")
-    jacocoDir= file("${masterResourcesDir}/jacoco")
 }
 
-// 全プロジェクト共通
 allprojects {
 
-    apply plugin: 'java'
+    apply plugin: 'java-library'
 
-	// 拡張プロパティ
-    ext {
-
-        javaVersion = '1.8'
-        encoding = 'UTF-8'
-        lineSeparator = '\\n'
-    }
-
-    // 設定
     configurations.all {
+
         // 依存関係のローカルキャッシュ無効化（「changing: true」を対象の依存関係の付与する）
-        //   例：compile group: （中略） version: '2.11.1', changing: true
         resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
     }
 
-    // 依存関係
     dependencies {
 
     }
 
     repositories {
 
-        mavenCentral() // セントラルMavenリポジトリ
+        mavenCentral()
         maven { url innerMavenRepoUrl } // 社内Mavenリポジトリ
-        mavenLocal() // ローカルMavenリポジトリ
     }
 }
 
-// サブプロジェクト共通
 subprojects{
 
     group = "${baseGroupId}.${groupId}"
-    version = "${branchName}.${environment}"
+    version = branchName
 
     compileJava {
 
@@ -67,11 +54,10 @@ subprojects{
         options.encoding = encoding
     }
 
-    // 依存関係
     dependencies {
 
-        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
-        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
+        implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
+        implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
     }
 }
 
@@ -86,8 +72,8 @@ configure(bizProjects) {
     // 依存関係
     dependencies {
 
-        dependProjects.name.each{ compile project(":${it}") } // 共有プロジェクト
-        runtime files("${deployRootDir}/${confDir}") // 外部リソースのクラスパス
+        dependProjects.name.each{ implementation project(":${it}") } // 共有プロジェクト
+        implementation files("${deployRootDir}/${confDir}") // 外部リソースのクラスパス
     }
 }
 
@@ -106,16 +92,26 @@ configure(bizWebProjects) {
     apply plugin: 'war'
     apply plugin: 'eclipse-wtp'
 
+    ext {
+        // ローカルWebサーバ情報
+        localWebServerHome = localWebServerDir == ''
+            ? new File(rootProject.projectDir, "web-server/${webServerHome}")
+            : new File("${localWebServerDir}/${webServerHome}")
+
+        localWebServerLibDir = new File(localWebServerHome, webServerLibDir)
+    }
+
     // コンテキストパス
     eclipse.wtp.component { contextPath  = contextPath }
 
     // 依存関係
     dependencies {
 
+        providedCompile fileTree(dir: localWebServerLibDir, include: 'java*/**/*.jar')
     }
 }
 
-// 対象のプロジェクト一覧を取得
+// 対象のプロジェクト一覧取得メソッド
 def getProjects(keywords) {
 
     return subprojects.findAll {

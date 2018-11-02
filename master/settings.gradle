@@ -9,3 +9,6 @@ subprojectsTree.visit { includedSubprojects << it.name }
 
 // 抽出したサブプロジェクトをインクルード
 includedSubprojects.each { includeFlat it }
+
+// maven-publishが使用するフラグがGradle 5.0 よりデフォルトから削除されるため、ここで宣言
+enableFeaturePreview('STABLE_PUBLISHING')

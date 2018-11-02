@@ -1,0 +1,41 @@
+/*
+ * 共有プロジェクトのJarを社内Mavenリポジトリに公開する
+ * ・実行タスク：publish
+ *
+ */
+// 共有プロジェクト共通
+configure(sharedProjects) {
+
+    apply plugin: 'maven-publish'
+
+    // ソースのJar作成
+    task sourcesJar(type: Jar) {
+
+        classifier = 'sources'
+        from sourceSets.main.allJava
+     }
+
+    // JavadocのJar作成
+    task javadocJar(type: Jar) {
+
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    // 成果物の公開
+    publishing {
+
+        repositories { maven { url = innerMavenRepoUrl }}
+
+        publications {
+
+            mavenJava(MavenPublication) {
+
+                from components.java
+
+                artifact sourcesJar
+                artifact javadocJar
+            }
+        }
+    }
+}
