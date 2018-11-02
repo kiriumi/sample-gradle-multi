@@ -23,8 +23,12 @@ plugins {
   id 'at.bxm.svntools' version '2.2.1' // SVN
 }
 
-// 拡張プロパティ
 ext{
+    // ルートプロジェクトのMiscディレクトリ
+    masterMiscDir = file('misc')
+    checkstyleDir = file("${masterMiscDir}/checkstyle")
+    jacocoDir= file("${masterMiscDir}/jacoco")
+
     // flywayのタスククラス
     // ※拡張プロパティを通さないと、外部Gradleスクリプト側でクラスと認識されない
     flywayCleanTask = org.flywaydb.gradle.task.FlywayCleanTask
@@ -38,10 +42,10 @@ ext{
 
 // 外部Gradleスクリプトの適用
 def gradleScriptsDir = 'gradle-scripts'
-apply from: "${gradleScriptsDir}/java.gradle" // プロジェクトの共通設定
-apply from: "${gradleScriptsDir}/publish.gradle" // 共有プロジェクトの設定
-apply from: "${gradleScriptsDir}/test.gradle" // テストの共通設定
-apply from: "${gradleScriptsDir}/init-projects.gradle" // プロジェクトの初期化
-apply from: "${gradleScriptsDir}/db-migration.gradle" // DBマイグレーション
-apply from: "${gradleScriptsDir}/deploy-batch.gradle" // バッチデプロイ
-apply from: "${gradleScriptsDir}/deploy-web.gradle" // Webデプロイ
+apply from: "${gradleScriptsDir}/java.gradle"
+apply from: "${gradleScriptsDir}/publish.gradle"
+apply from: "${gradleScriptsDir}/test.gradle"
+apply from: "${gradleScriptsDir}/init-projects.gradle"
+apply from: "${gradleScriptsDir}/db-migration.gradle"
+apply from: "${gradleScriptsDir}/deploy-batch.gradle"
+apply from: "${gradleScriptsDir}/deploy-web.gradle"

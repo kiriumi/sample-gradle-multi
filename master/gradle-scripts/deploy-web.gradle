@@ -1,5 +1,5 @@
 /*
- * Warを作成しWebサーバにデプロイする。（開発の場合はテストも実施）
+ * WarをWebサーバにデプロイする（開発の場合はテストも実施）
  * ・実行タスク（開発）：clean assemble cargoStartLocal check cargoStopLocal
  * ・実行タスク（本番）：clean assemble cargoUndeployRemote cargoDeployRemote
  *
@@ -21,8 +21,7 @@ configure(bizWebProjects) {
         port = Integer.parseInt(cargoPort)
 
         deployable {
-            // ページを表示するためのURL：http://ホスト名/contextPath/ページ名
-            //   例：http://localhost:8080/SampleWebApp/login.xhtml
+
             context = contextPath
         }
 

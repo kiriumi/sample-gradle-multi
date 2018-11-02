@@ -11,6 +11,7 @@ subprojects {
     apply plugin: 'pmd'
 
     ext {
+        // JaCoCoレポートファイルの出力先
         jacocoReportFile = file("${reportsDir}/jacoco/jacoco.exec")
     }
 

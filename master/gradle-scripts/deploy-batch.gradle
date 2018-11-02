@@ -1,5 +1,5 @@
 /*
- * バッチ関連のリソースをマスターに集約し、デプロイする
+ * バッチのリソースをマスターに集約し、デプロイする
  * ・実行タスク：clean deployBatch commitDeploied tagDeploied
  *
  */
@@ -43,7 +43,7 @@ def getAsJarArray(targetJars) {
 }
 
 // 拡張コピータスククラス
-//   ※更新日時を維持するメソッドを追加
+// ※更新日時を維持するメソッドを追加
 class CopyExtended extends Copy {
 
     // 更新日時を維持する
@@ -64,7 +64,7 @@ class CopyExtended extends Copy {
 
 configure(bizBatchProjects) {
 
-     // シェルをコピー
+     // シェルのコピータスク
     task copyShells(type: CopyExtended) {
 
         (dependProjects + project).each {
@@ -81,7 +81,7 @@ configure(bizBatchProjects) {
         presereveTimestamp()
     }
 
-    // 設定ファイルをコピー
+    // 設定ファイルのコピータスク
     task copyConfs(type: CopyExtended) {
 
         (dependProjects + project).each {
@@ -98,7 +98,7 @@ configure(bizBatchProjects) {
         presereveTimestamp()
     }
 
-    // Jarをコピー
+    // Jarのコピータスク
     task copyJars doLast {
 
         // 業務Jar
@@ -117,7 +117,7 @@ configure(bizBatchProjects) {
         }
     }
 
-    // 配布リソースを圧縮
+    // 配布リソースの圧縮タスク
     task zipDists(type: Zip, dependsOn: [copyShells, copyConfs, copyJars])  {
 
         archiveName = distFilename
@@ -126,6 +126,7 @@ configure(bizBatchProjects) {
 
     // SSH共通設定　
     ssh.settings {
+
         knownHosts = allowAnyHosts
     }
 
@@ -148,7 +149,7 @@ configure(bizBatchProjects) {
         }
     }
 
-    // リソース削除
+    // リソースの削除タスク
     task deleteDeploied doLast {
 
         ssh.run {
@@ -167,7 +168,7 @@ configure(bizBatchProjects) {
         }
     }
 
-    // デプロイ
+    // デプロイタスク
     task deployBatch(dependsOn: [zipDists, deleteDeploied]) doLast {
 
         ssh.run {
@@ -217,6 +218,7 @@ configure(bizBatchProjects) {
 
     // SVN接続情報
     svntools {
+
         username = svnUser
         password = svnPassword
     }

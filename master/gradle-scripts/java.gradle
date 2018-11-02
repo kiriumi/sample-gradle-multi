@@ -1,3 +1,8 @@
+/*
+ * Jar, Warを作成する
+ * ・実行タスク：publish
+ *
+ */
 // 拡張プロパティ
 ext{
     // プロジェクト一覧
@@ -7,38 +12,29 @@ ext{
     bizBatchProjects = batchProjects - sharedProjects // 業務バッチプロジェクト
     bizWebProjects =  webProjects - sharedProjects // 業務オンラインプロジェクト
     bizProjects = bizBatchProjects + bizWebProjects // 業務プロジェクト
-
-    // マスタープロジェクトのリソースディレクトリ
-    masterMiscDir = file('misc')
-    checkstyleDir = file("${masterMiscDir}/checkstyle")
-    jacocoDir= file("${masterMiscDir}/jacoco")
 }
 
-// 全プロジェクト共通
 allprojects {
 
     apply plugin: 'java-library'
 
-    // 設定
     configurations.all {
 
         // 依存関係のローカルキャッシュ無効化（「changing: true」を対象の依存関係の付与する）
         resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
     }
 
-    // 依存関係
     dependencies {
 
     }
 
     repositories {
 
-        mavenCentral() // セントラルMavenリポジトリ
+        mavenCentral()
         maven { url innerMavenRepoUrl } // 社内Mavenリポジトリ
     }
 }
 
-// サブプロジェクト共通
 subprojects{
 
     group = "${baseGroupId}.${groupId}"
@@ -58,7 +54,6 @@ subprojects{
         options.encoding = encoding
     }
 
-    // 依存関係
     dependencies {
 
         implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
@@ -116,7 +111,7 @@ configure(bizWebProjects) {
     }
 }
 
-// 対象のプロジェクト一覧を取得
+// 対象のプロジェクト一覧取得メソッド
 def getProjects(keywords) {
 
     return subprojects.findAll {
