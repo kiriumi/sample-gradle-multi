@@ -35,7 +35,6 @@ allprojects {
 
         mavenCentral() // セントラルMavenリポジトリ
         maven { url innerMavenRepoUrl } // 社内Mavenリポジトリ
-        mavenLocal() // ローカルMavenリポジトリ
     }
 }
 
@@ -43,7 +42,7 @@ allprojects {
 subprojects{
 
     group = "${baseGroupId}.${groupId}"
-    version = "${branchName}.${environment}"
+    version = branchName
 
     compileJava {
 
