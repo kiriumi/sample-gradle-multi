@@ -6,7 +6,8 @@
  */
 configure(bizWebProjects) {
 
-    apply plugin: "com.bmuschko.cargo"
+    apply plugin: 'com.bmuschko.cargo'
+    apply plugin: 'jacoco'
 
     dependencies {
 
@@ -32,7 +33,7 @@ configure(bizWebProjects) {
             def jacocoAagentJar = new File("${jacocoDir}/jacocoagent.jar").path
 
             jvmArgs = '-Xms64m -Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true '
-            jvmArgs += "-javaagent:${jacocoAagentJar}=destfile=${jacocoReportFile.path},append=false,excludes=**/Test*.class:**/*Test.class"
+            jvmArgs += "-javaagent:${jacocoAagentJar}=destfile=${test.jacoco.destinationFile.path},append=false,excludes=**/Test*.class:**/*Test.class"
         }
 
         remote {

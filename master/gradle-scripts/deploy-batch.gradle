@@ -1,6 +1,6 @@
 /*
  * バッチのリソースをマスターに集約し、デプロイする
- * ・実行タスク：clean deployBatch commitDeploied tagDeploied
+ * ・実行タスク：deployBatch afterDeployBatch
  *
  */
  apply plugin: 'org.hidetake.ssh'
@@ -42,14 +42,14 @@ def getAsJarArray(targetJars) {
     return targetJars.trim().isEmpty() ? none : targetJars.split().collect{ "${it}-*.jar" }
 }
 
-// 拡張コピータスククラス
-// ※更新日時を維持するメソッドを追加
-class CopyExtended extends Copy {
+// 拡張コピータスククラ（更新日時を維持するメソッドを追加）
+def class CopyExtended extends Copy {
 
     // 更新日時を維持する
     def presereveTimestamp() {
 
         def copyFileDetailses = []
+
         eachFile { copyFileDetailses <<  it } // eachFileの実行タイミングはdoLastと同じ
 
         doLast {
@@ -64,7 +64,6 @@ class CopyExtended extends Copy {
 
 configure(bizBatchProjects) {
 
-     // シェルのコピータスク
     task copyShells(type: CopyExtended) {
 
         (dependProjects + project).each {
@@ -81,7 +80,6 @@ configure(bizBatchProjects) {
         presereveTimestamp()
     }
 
-    // 設定ファイルのコピータスク
     task copyConfs(type: CopyExtended) {
 
         (dependProjects + project).each {
@@ -98,11 +96,11 @@ configure(bizBatchProjects) {
         presereveTimestamp()
     }
 
-    // Jarのコピータスク
     task copyJars doLast {
 
         // 業務Jar
         copy {
+
             from libsDir
             into "${distsDir}/${deployRootDir}/${jarDir}"
             include includeJars
@@ -117,32 +115,28 @@ configure(bizBatchProjects) {
         }
     }
 
-    // 配布リソースの圧縮タスク
     task zipDists(type: Zip, dependsOn: [copyShells, copyConfs, copyJars])  {
 
         archiveName = distFilename
         from "${distsDir}/${deployRootDir}"
     }
 
-    // SSH共通設定　
-    ssh.settings {
-
-        knownHosts = allowAnyHosts
-    }
+    ssh.settings { knownHosts = allowAnyHosts }
 
     // サーバ接続情報
     remotes {
 
         // 配布リソースの転送ユーザ
         transferer {
+
             host = deployHost
             user = deployUser
             password = deployPassword
-
         }
 
         // 配布リソースのデプロイユーザ
         deployer {
+
             host = deployHost
             user = deployUser
             password = deployPassword
@@ -150,7 +144,7 @@ configure(bizBatchProjects) {
     }
 
     // 過去のデプロイリソース削除タスク
-    task deleteDeploied doLast {
+    task deleteDeploiedBatch doLast {
 
         ssh.run {
 
@@ -168,8 +162,7 @@ configure(bizBatchProjects) {
         }
     }
 
-    // デプロイタスク
-    task deployBatch(dependsOn: [zipDists, deleteDeploied]) doLast {
+    task deployBatch(dependsOn: [zipDists, deleteDeploiedBatch]) doLast {
 
         ssh.run {
 
@@ -208,7 +201,7 @@ configure(bizBatchProjects) {
     }
 
     // デプロイリソースを、差分比較用ディレクトリにコピー
-    task copyDeploied (type: CopyExtended){
+    task copyReleasedForDiff (type: CopyExtended){
 
        // 配布リソースをdiffにコピー
         from "${distsDir}/${deployRootDir}"
@@ -216,24 +209,23 @@ configure(bizBatchProjects) {
         presereveTimestamp()
     }
 
-    // SVN接続情報
     svntools {
 
         username = svnUser
         password = svnPassword
     }
 
-    // デプロイリソースのコミットタスク
-    task commitDeploied(type: svnCommitTask, dependsOn: copyDeploied) doLast {
+    task commitReleasedForDiff(type: at.bxm.gradleplugins.svntools.tasks.SvnCommit, dependsOn: copyReleasedForDiff) doLast {
 
         source <<  "${diffDeploiedDir}/${deployHost}"
         commitMessage = svnCommitDeploiedMessage
     }
 
-    // タグ付けタスク
-    task tagDeploied(type: svnTagTask) {
+    task tagReleased(type: at.bxm.gradleplugins.svntools.tasks.SvnTag) {
 
         tagName = branchName
         commitMessage = svnTagMessage
     }
+
+    task afterDeployBatch(dependsOn: [commitReleasedForDiff, tagReleased])
 }

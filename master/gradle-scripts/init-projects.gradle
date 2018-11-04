@@ -3,6 +3,11 @@
  * ・実行タスク：cleanEclipse eclipse initSubrojects
  *
  */
+task wrapper(type: Wrapper) {
+
+    gradleVersion = gradleWrapperVersion
+}
+
 allprojects {
 
     apply plugin: 'eclipse'
@@ -26,30 +31,28 @@ allprojects {
             """.stripIndent())
 
          // 改行コード
+         /* TODO: EclipseのAnyEditが保存時にnull例外が発生するため、コメントアウト
          file('.settings/org.eclipse.core.runtime.prefs').write("""
             line.separator=${lineSeparator}
+            """.stripIndent())
+         */
+
+         // Buildship
+         file('.settings/org.eclipse.buildship.core.prefs').write("""
+            connection.project.dir=
+            override.workspace.settings=true
+            connection.gradle.distribution=GRADLE_DISTRIBUTION(VERSION(${wrapper.gradleVersion}))
+            gradle.user.home=
+            offline.mode=false
+            build.scans.enabled=false
             """.stripIndent())
     }}
 }
 
-// ルートプロジェクト
-eclipseJdt { doLast {
-
-     // Buildship
-     file('.settings/org.eclipse.buildship.core.prefs').write("""
-        connection.project.dir=
-        override.workspace.settings=true
-        connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
-        gradle.user.home=
-        offline.mode=false
-        build.scans.enabled=false
-        """.stripIndent())
-}}
-
 subprojects {
 
     ext {
-        // パッケージのパス
+        // パッケージからパスに変換
         packagePath = group.replace('.', '/')
 
         // UT以外の環境名

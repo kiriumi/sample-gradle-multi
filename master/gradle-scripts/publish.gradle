@@ -3,26 +3,22 @@
  * ・実行タスク：publish
  *
  */
-// 共有プロジェクト共通
 configure(sharedProjects) {
 
     apply plugin: 'maven-publish'
 
-    // ソースのJar作成
     task sourcesJar(type: Jar) {
 
         classifier = 'sources'
         from sourceSets.main.allJava
      }
 
-    // JavadocのJar作成
     task javadocJar(type: Jar) {
 
         classifier = 'javadoc'
         from javadoc.destinationDir
     }
 
-    // 成果物の公開
     publishing {
 
         repositories { maven { url = innerMavenRepoUrl }}

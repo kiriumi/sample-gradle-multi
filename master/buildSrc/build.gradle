@@ -1,0 +1,17 @@
+/*
+ * 外部Gradleプラグインのクラスパスを設定
+ *
+ */
+repositories {
+
+    maven { url "https://plugins.gradle.org/m2/" }
+}
+
+dependencies {
+
+    implementation group: 'org.flywaydb', name: 'flyway-gradle-plugin', version: '5.2.1'
+    implementation group: 'gradle.plugin.com.github.spotbugs', name: 'spotbugs-gradle-plugin', version: '1.6.5'
+    implementation group: 'org.hidetake', name: 'gradle-ssh-plugin', version: '2.9.0'
+    implementation group: 'com.bmuschko', name: 'gradle-cargo-plugin', version: '2.4'
+    implementation group: 'at.bxm.gradleplugins', name: 'gradle-svntools-plugin', version: '2.2.1'
+}
