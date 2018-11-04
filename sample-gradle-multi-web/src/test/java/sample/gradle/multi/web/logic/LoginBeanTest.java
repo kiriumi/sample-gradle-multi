@@ -21,7 +21,7 @@ public class LoginBeanTest {
         String userDir = System.getProperty("user.dir");
 
         File webdriver = new File(new File(userDir).getParent(),
-                "master/resources/web-driver/chromedriver.exe");
+                "master/misc/web-driver/chromedriver.exe");
 
         Configuration.browser = WebDriverRunner.CHROME;
         System.setProperty("webdriver.chrome.driver", webdriver.getPath());
