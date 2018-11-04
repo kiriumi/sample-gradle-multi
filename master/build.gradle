@@ -10,28 +10,9 @@ ext{
     jacocoDir= file("${masterMiscDir}/jacoco")
 }
 
-// 拡張コピータスククラ（更新日時を維持するメソッドを追加）
-def class CopyExtended extends Copy {
-
-    // 更新日時を維持する
-    def presereveTimestamp() {
-
-        def copyFileDetailses = []
-
-        eachFile { copyFileDetailses <<  it } // eachFileの実行タイミングはdoLastと同じ
-
-        doLast {
-
-            copyFileDetailses.each { copyFileDetails ->
-                def destFile = new File(destinationDir, copyFileDetails.path)
-                if(destFile.exists()) { destFile.setLastModified(copyFileDetails.lastModified) }
-            }
-        }
-    }
-}
-
 // 外部Gradleスクリプトの適用
 def gradleScriptsDir = 'gradle-scripts'
+apply from: "${gradleScriptsDir}/branch-name.gradle"
 apply from: "${gradleScriptsDir}/java.gradle"
 apply from: "${gradleScriptsDir}/test.gradle"
 apply from: "${gradleScriptsDir}/publish.gradle"
