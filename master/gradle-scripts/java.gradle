@@ -69,7 +69,6 @@ configure(bizProjects) {
         dependProjects = getProjects(dependProjectNames)
     }
 
-    // 依存関係
     dependencies {
 
         dependProjects.name.each{ implementation project(":${it}") } // 共有プロジェクト
@@ -80,7 +79,6 @@ configure(bizProjects) {
 // 業務バッチプロジェクト共通
 configure(bizProjects) {
 
-    // 依存関係
     dependencies {
 
     }
@@ -104,7 +102,6 @@ configure(bizWebProjects) {
     // コンテキストパス
     eclipse.wtp.component { contextPath  = contextPath }
 
-    // 依存関係
     dependencies {
 
         providedCompile fileTree(dir: localWebServerLibDir, include: 'java*/**/*.jar')

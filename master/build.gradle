@@ -3,49 +3,42 @@
  * ・実行タスク（CI）：clean cleanDb migrateDb assemble cargoStartLocal check cargoStopLocal afterBuild uploadArchives
  * ・実行タスク（リリース）：clean migrateDb assemble afterBuild uploadArchives deployBatch cargoUndeployRemote cargoDeployRemote commitDeploied tagDeploied
  */
-// 外部プラグインの適用
-buildscript {
-
-    repositories {
-
-        maven { url "https://plugins.gradle.org/m2/" }
-    }
-
-    // cargoプラグインのみ、こちらで宣言しないとコンテナIDの未定義エラーになる
-    dependencies { classpath 'com.bmuschko:gradle-cargo-plugin:2.4'}
-}
-
-plugins {
-
-  id 'com.github.spotbugs' version '1.6.4' // 静的解析
-  id 'org.flywaydb.flyway' version '5.1.4' // DBマイグレーション
-  id 'org.hidetake.ssh' version '2.9.0' // SSH
-  id 'at.bxm.svntools' version '2.2.1' // SVN
-}
-
 ext{
     // ルートプロジェクトのMiscディレクトリ
     masterMiscDir = file('misc')
     checkstyleDir = file("${masterMiscDir}/checkstyle")
     jacocoDir= file("${masterMiscDir}/jacoco")
-
-    // flywayのタスククラス
-    // ※拡張プロパティを通さないと、外部Gradleスクリプト側でクラスと認識されない
-    flywayCleanTask = org.flywaydb.gradle.task.FlywayCleanTask
-    flywayMigrateTask = org.flywaydb.gradle.task.FlywayMigrateTask
-
-    // SVNのタスククラス
-    // ※拡張プロパティを通さないと、外部Gradleスクリプト側でクラスと認識されない
-    svnCommitTask = at.bxm.gradleplugins.svntools.tasks.SvnCommit
-    svnTagTask = at.bxm.gradleplugins.svntools.tasks.SvnTag
 }
+
+
+// 拡張コピータスククラ（更新日時を維持するメソッドを追加）
+def class CopyExtended extends Copy {
+
+    // 更新日時を維持する
+    def presereveTimestamp() {
+
+        def copyFileDetailses = []
+
+        eachFile { copyFileDetailses <<  it } // eachFileの実行タイミングはdoLastと同じ
+
+        doLast {
+
+            copyFileDetailses.each { copyFileDetails ->
+                def destFile = new File(destinationDir, copyFileDetails.path)
+                if(destFile.exists()) { destFile.setLastModified(copyFileDetails.lastModified) }
+            }
+        }
+    }
+}
+
 
 // 外部Gradleスクリプトの適用
 def gradleScriptsDir = 'gradle-scripts'
 apply from: "${gradleScriptsDir}/java.gradle"
-apply from: "${gradleScriptsDir}/publish.gradle"
 apply from: "${gradleScriptsDir}/test.gradle"
+apply from: "${gradleScriptsDir}/publish.gradle"
 apply from: "${gradleScriptsDir}/init-projects.gradle"
 apply from: "${gradleScriptsDir}/db-migration.gradle"
 apply from: "${gradleScriptsDir}/deploy-batch.gradle"
 apply from: "${gradleScriptsDir}/deploy-web.gradle"
+

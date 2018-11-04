@@ -7,10 +7,9 @@ subprojects {
 
     apply plugin: 'checkstyle'
     apply plugin: 'com.github.spotbugs'
-    apply plugin: 'jacoco'
     apply plugin: 'pmd'
+    apply plugin: 'jacoco'
 
-    // 依存関係
     dependencies {
 
         testImplementation group: 'junit', name: 'junit', version: '4.12'
@@ -24,31 +23,21 @@ subprojects {
 
         toolVersion = '8.13' // Gradleラッパーの場合、バージョンを指定しないとエラーになる
         configFile = file("${checkstyleDir}/${checkstyleConfigFile}")
-        ignoreFailures = true
     }
 
+    // 検査結果が失敗でも、ビルドは成功させる
+    checkstyle.ignoreFailures = true
+    spotbugs.ignoreFailures = true
+    pmd.ignoreFailures = true
+
+    // テストコードは検査対象外
     checkstyleTest.excludes = ['**/*']
-
-    spotbugs {
-
-        ignoreFailures = true
-    }
-
     spotbugsTest.excludes = ['**/*']
-
-    pmd {
-
-        ignoreFailures = true
-    }
-
     pmdTest.excludes = ['**/*']
 
-    test {
+    test.jacoco {
 
-        jacoco {
-
-            append = false
-            excludes = ['**/*Test*']
-        }
+        append = false
+        excludes = ['**/*Test*']
     }
 }

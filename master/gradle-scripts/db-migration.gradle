@@ -5,6 +5,8 @@
  */
 allprojects {
 
+    apply plugin: 'org.flywaydb.flyway'
+
     ext {
         // SQLiteのDBファイルパス
         jdbcUrl = String.format(jdbcUrl, rootProject.projectDir.path)
@@ -19,10 +21,7 @@ allprojects {
 
 subprojects {
 
-    apply plugin: 'org.flywaydb.flyway'
-
-    // DBマイグレーションタスク
-    task migrateDb(type: flywayMigrateTask) {
+    task migrateDb(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
 
         driver = jdbcDriver
         url = jdbcUrl
@@ -37,8 +36,7 @@ subprojects {
     }
 }
 
-// DBクリーンタスク
-task cleanDb(type: flywayCleanTask) {
+task cleanDb(type: org.flywaydb.gradle.task.FlywayCleanTask) {
 
     driver = jdbcDriver
     url = jdbcUrl
