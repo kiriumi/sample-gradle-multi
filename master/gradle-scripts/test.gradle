@@ -10,11 +10,6 @@ subprojects {
     apply plugin: 'jacoco'
     apply plugin: 'pmd'
 
-    ext {
-        // JaCoCoレポートファイルの出力先
-        jacocoReportFile = file("${reportsDir}/jacoco/jacoco.exec")
-    }
-
     // 依存関係
     dependencies {
 
@@ -54,7 +49,6 @@ subprojects {
 
             append = false
             excludes = ['**/*Test*']
-            destinationFile = jacocoReportFile
         }
     }
 }
