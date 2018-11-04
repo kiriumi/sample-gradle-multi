@@ -45,6 +45,7 @@ subprojects{
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
         options.encoding = encoding
+        options.compilerArgs += ['-proc:none'] // 注釈処理（ソースコードの自動生成や検証）をしない
     }
 
     compileTestJava {
@@ -52,6 +53,7 @@ subprojects{
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
         options.encoding = encoding
+        options.compilerArgs += ['-proc:none'] // 注釈処理をしない
     }
 
     dependencies {
