@@ -1,0 +1,41 @@
+import groovy.sql.Sql
+
+project.ext.branchName = getBranchName()
+
+def getBranchName() {
+
+    def gitHeadFile = file('../.git/HEAD')
+    def snvDbFile = file('.svn/wc.db')
+
+    if( gitHeadFile.exists() ) {
+        // Git
+        return gitHeadFile.text.split('/')[2]
+
+    } else if ( snvDbFile.exists() ) {
+        // SVN
+        return getBranchNameSvn()
+
+    } else {
+        // Gradleプロパティファイル
+        return project.ext.branchName
+    }
+}
+
+// ローカルのSVN-DBファイルからブランチ名を取得
+def getBranchNameSvn() {
+
+    def snvDbFile = file('.svn/wc.db')
+
+    // SVN-DBファイルがない場合、プロパティファイルの設定値を返す
+    if (!snvDbFile.exists()) { return project.ext.branchName }
+
+    def sql = Sql.newInstance("jdbc:sqlite:${snvDbFile.path}", 'org.sqlite.JDBC')
+    def branchName = ''
+
+    sql.eachRow("select * from NODES where local_relpath = ''") {
+
+        branchName = it.repos_path.split('/')[1]
+    }
+
+    return branchName
+}
