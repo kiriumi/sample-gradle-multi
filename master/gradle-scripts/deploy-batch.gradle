@@ -1,6 +1,6 @@
 /*
  * バッチのリソースをマスターに集約し、デプロイする
- * ・実行タスク：clean deployBatch commitDeploied tagDeploied
+ * ・実行タスク：deployBatch afterDeployBatch
  *
  */
  apply plugin: 'org.hidetake.ssh'
@@ -215,7 +215,7 @@ configure(bizBatchProjects) {
         password = svnPassword
     }
 
-    task commitDeploiedForDiff(type: at.bxm.gradleplugins.svntools.tasks.SvnCommit, dependsOn: copyReleasedForDiff) doLast {
+    task commitReleasedForDiff(type: at.bxm.gradleplugins.svntools.tasks.SvnCommit, dependsOn: copyReleasedForDiff) doLast {
 
         source <<  "${diffDeploiedDir}/${deployHost}"
         commitMessage = svnCommitDeploiedMessage
@@ -226,4 +226,6 @@ configure(bizBatchProjects) {
         tagName = branchName
         commitMessage = svnTagMessage
     }
+
+    task afterDeployBatch(dependsOn: [commitReleasedForDiff, tagReleased])
 }
