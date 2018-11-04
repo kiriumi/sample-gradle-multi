@@ -52,7 +52,7 @@ allprojects {
 subprojects {
 
     ext {
-        // パッケージのパス
+        // パッケージからパスに変換
         packagePath = group.replace('.', '/')
 
         // UT以外の環境名
@@ -98,7 +98,7 @@ subprojects {
         }
     }
 
-    task initSubprojects(dependsOn: [wrapper, makeSourceSetsDirs, makeMiscDirs])
+    task initSubprojects(dependsOn: [makeSourceSetsDirs, makeMiscDirs])
 }
 
 // ディレクトリ作成メソッド
