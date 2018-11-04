@@ -3,10 +3,7 @@
  * ・実行タスク：cleanEclipse eclipse initSubrojects
  *
  */
-task wrapper(type: Wrapper) {
-
-    gradleVersion = gradleWrapperVersion
-}
+wrapper.gradleVersion = gradleWrapperVersion
 
 allprojects {
 
