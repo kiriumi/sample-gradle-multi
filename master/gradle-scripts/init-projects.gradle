@@ -26,9 +26,11 @@ allprojects {
             """.stripIndent())
 
          // 改行コード
+         /* TODO: EclipseのAnyEditが保存時にnull例外が発生するため、コメントアウト
          file('.settings/org.eclipse.core.runtime.prefs').write("""
             line.separator=${lineSeparator}
             """.stripIndent())
+         */
 
          // Buildship
          file('.settings/org.eclipse.buildship.core.prefs').write("""
