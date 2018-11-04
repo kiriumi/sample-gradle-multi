@@ -30,19 +30,19 @@ ext {
     diffDeploiedDir= "${projectDir}/diff-deploied"
 }
 
-// プロパティファイルで指定されたリソースを配列にする
+// プロパティファイルで指定されたリソースを、配列で取得する
 def getAsArray(targets) {
 
     return targets.trim().isEmpty() ? none : targets.split()
 }
 
-// プロパティファイルで指定されたJarを配列にする
+// プロパティファイルで指定されたJarを、配列で取得する
 def getAsJarArray(targetJars) {
 
     return targetJars.trim().isEmpty() ? none : targetJars.split().collect{ "${it}-*.jar" }
 }
 
-// 拡張コピータスククラ（更新日時を維持するメソッドを追加）
+// 拡張コピータスククラス（更新日時を維持するメソッドを追加）
 def class CopyExtended extends Copy {
 
     // 更新日時を維持する

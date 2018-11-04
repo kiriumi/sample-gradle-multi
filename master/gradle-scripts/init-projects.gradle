@@ -1,12 +1,9 @@
 /*
  * プロジェクトを初期化する
- * ・実行タスク：cleanEclipse eclipse initSubrojects
+ * ・実行タスク：wrapper initSubrojects cleanEclipse eclipse
  *
  */
-task wrapper(type: Wrapper) {
-
-    gradleVersion = gradleWrapperVersion
-}
+wrapper.gradleVersion = gradleWrapperVersion
 
 allprojects {
 
