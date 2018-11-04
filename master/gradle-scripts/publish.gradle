@@ -21,7 +21,7 @@ configure(sharedProjects) {
 
     publishing {
 
-        repositories { maven { url = innerMavenRepoUrl }}
+        repositories { maven { url = inhouseMavenRepoUrl }}
 
         publications {
 
