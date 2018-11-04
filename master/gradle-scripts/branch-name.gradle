@@ -1,3 +1,7 @@
+/*
+ * ブランチ名を取得する
+ *
+ */
 import groovy.sql.Sql
 
 project.ext.branchName = getBranchName()
