@@ -31,7 +31,7 @@ allprojects {
     repositories {
 
         mavenCentral()
-        maven { url innerMavenRepoUrl } // 社内Mavenリポジトリ
+        maven { url inhouseMavenRepoUrl } // 社内Mavenリポジトリ
     }
 }
 
