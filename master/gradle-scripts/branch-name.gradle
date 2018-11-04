@@ -17,7 +17,7 @@ def getBranchName() {
 
     } else if ( snvDbFile.exists() ) {
         // SVN
-        return getBranchNameSvn()
+        return getBranchNameSvn(snvDbFile)
 
     } else {
         // Gradleプロパティファイル
@@ -26,20 +26,12 @@ def getBranchName() {
 }
 
 // ローカルのSVN-DBファイルからブランチ名を取得
-def getBranchNameSvn() {
-
-    def snvDbFile = file('.svn/wc.db')
-
-    // SVN-DBファイルがない場合、プロパティファイルの設定値を返す
-    if (!snvDbFile.exists()) { return project.ext.branchName }
+def getBranchNameSvn(snvDbFile) {
 
     def sql = Sql.newInstance("jdbc:sqlite:${snvDbFile.path}", 'org.sqlite.JDBC')
     def branchName = ''
 
-    sql.eachRow("select * from NODES where local_relpath = ''") {
-
-        branchName = it.repos_path.split('/')[1]
-    }
+    sql.eachRow("select * from NODES where local_relpath = ''") { branchName = it.repos_path.split('/')[1] }
 
     return branchName
 }
