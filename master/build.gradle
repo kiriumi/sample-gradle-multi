@@ -10,7 +10,6 @@ ext{
     jacocoDir= file("${masterMiscDir}/jacoco")
 }
 
-
 // 拡張コピータスククラ（更新日時を維持するメソッドを追加）
 def class CopyExtended extends Copy {
 
@@ -31,7 +30,6 @@ def class CopyExtended extends Copy {
     }
 }
 
-
 // 外部Gradleスクリプトの適用
 def gradleScriptsDir = 'gradle-scripts'
 apply from: "${gradleScriptsDir}/java.gradle"
@@ -41,4 +39,3 @@ apply from: "${gradleScriptsDir}/init-projects.gradle"
 apply from: "${gradleScriptsDir}/db-migration.gradle"
 apply from: "${gradleScriptsDir}/deploy-batch.gradle"
 apply from: "${gradleScriptsDir}/deploy-web.gradle"
-
