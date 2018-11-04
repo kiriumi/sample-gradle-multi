@@ -29,22 +29,18 @@ allprojects {
          file('.settings/org.eclipse.core.runtime.prefs').write("""
             line.separator=${lineSeparator}
             """.stripIndent())
+
+         // Buildship
+         file('.settings/org.eclipse.buildship.core.prefs').write("""
+            connection.project.dir=
+            override.workspace.settings=true
+            connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
+            gradle.user.home=
+            offline.mode=false
+            build.scans.enabled=false
+            """.stripIndent())
     }}
 }
-
-// ルートプロジェクト
-eclipseJdt { doLast {
-
-     // Buildship
-     file('.settings/org.eclipse.buildship.core.prefs').write("""
-        connection.project.dir=
-        override.workspace.settings=true
-        connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
-        gradle.user.home=
-        offline.mode=false
-        build.scans.enabled=false
-        """.stripIndent())
-}}
 
 subprojects {
 
