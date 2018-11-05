@@ -2,20 +2,20 @@
  * ブランチ名を取得する
  *
  */
-import groovy.sql.Sql
+apply plugin: 'com.github.gmazzo.sqlite'
 
 project.ext.branchName = getBranchName()
 
 def getBranchName() {
 
     def gitHeadFile = file('../.git/HEAD')
-    def snvDbFile = file('.svn/wc.db')
+    def snvDbFile = file('../.svn/wc.db')
 
-    if( gitHeadFile.exists() ) {
+    if (gitHeadFile.exists()) {
         // Git
         return gitHeadFile.text.split('/')[2]
 
-    } else if ( snvDbFile.exists() ) {
+    } else if (snvDbFile.exists()) {
         // SVN
         return getBranchNameSvn(snvDbFile)
 
@@ -25,10 +25,10 @@ def getBranchName() {
     }
 }
 
-// ローカルのSVN-DBファイルからブランチ名を取得
+// ローカルのSubversionDBファイルからブランチ名を取得
 def getBranchNameSvn(snvDbFile) {
 
-    def sql = Sql.newInstance("jdbc:sqlite:${snvDbFile.path}", 'org.sqlite.JDBC')
+    def sql = openSQLiteDatabase(snvDbFile)
     def branchName = ''
 
     sql.eachRow("select * from NODES where local_relpath = ''") { branchName = it.repos_path.split('/')[1] }
