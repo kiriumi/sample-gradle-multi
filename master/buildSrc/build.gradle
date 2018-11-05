@@ -9,6 +9,7 @@ repositories {
 
 dependencies {
 
+    implementation group: 'gradle.plugin.gmazzo', name: 'sqlite-plugin', version: '0.2'
     implementation group: 'org.flywaydb', name: 'flyway-gradle-plugin', version: '5.2.1'
     implementation group: 'gradle.plugin.com.github.spotbugs', name: 'spotbugs-gradle-plugin', version: '1.6.5'
     implementation group: 'org.hidetake', name: 'gradle-ssh-plugin', version: '2.9.0'
