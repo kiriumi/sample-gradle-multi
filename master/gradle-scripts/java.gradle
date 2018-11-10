@@ -38,7 +38,6 @@ allprojects {
 subprojects{
 
     group = "${baseGroupId}.${groupId}"
-    version = branchName
 
     compileJava {
 

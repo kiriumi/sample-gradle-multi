@@ -205,7 +205,7 @@ configure(bizBatchProjects) {
 
     task tagReleased(type: at.bxm.gradleplugins.svntools.tasks.SvnTag) {
 
-        tagName = branchName
+        tagName = version
         commitMessage = svnTagMessage
     }
 
