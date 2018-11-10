@@ -1,13 +1,13 @@
 /*
  * ビルドスクリプトを統括
- * ・実行タスク（CI）：clean cleanDb migrateDb assemble cargoStartLocal check cargoStopLocal afterBuild uploadArchives
- * ・実行タスク（リリース）：clean migrateDb assemble afterBuild uploadArchives deployBatch cargoUndeployRemote cargoDeployRemote commitDeploied tagDeploied
+ * ・実行タスク（CI）：clean cleanDb migrateDb assemble cargoStartLocal check cargoStopLocal publish
+ * ・実行タスク（リリース）：clean migrateDb assemble deployBatch cargoUndeployRemote cargoDeployRemote afterDeploy
  */
 ext{
     // ルートプロジェクトのMiscディレクトリ
-    masterMiscDir = file('misc')
-    checkstyleDir = file("${masterMiscDir}/checkstyle")
-    jacocoDir= file("${masterMiscDir}/jacoco")
+    rootMiscDir = file('misc')
+    checkstyleDir = file("${rootMiscDir}/checkstyle")
+    jacocoDir= file("${rootMiscDir}/jacoco")
 }
 
 // 外部Gradleスクリプトの適用
@@ -20,3 +20,4 @@ apply from: "${gradleScriptsDir}/init-projects.gradle"
 apply from: "${gradleScriptsDir}/db-migration.gradle"
 apply from: "${gradleScriptsDir}/deploy-batch.gradle"
 apply from: "${gradleScriptsDir}/deploy-web.gradle"
+apply from: "${gradleScriptsDir}/deploy-after.gradle"

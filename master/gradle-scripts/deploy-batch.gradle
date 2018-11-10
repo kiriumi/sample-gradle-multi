@@ -1,12 +1,11 @@
 /*
- * バッチのリソースをマスターに集約し、デプロイする
- * ・実行タスク：deployBatch afterDeployBatch
+ * バッチのリソースをデプロイする
+ * ・実行タスク：deployBatch
  *
  */
 import sample.gradle.multi.build.tasks.CopyExtended
 
- apply plugin: 'org.hidetake.ssh'
- apply plugin: 'at.bxm.svntools'
+apply plugin: 'org.hidetake.ssh'
 
 ext {
 
@@ -58,6 +57,7 @@ configure(bizBatchProjects) {
         }
 
         into "${distsDir}/${deployRootDir}/${shellDir}"
+
         include includeShells
         presereveTimestamp()
     }
@@ -73,7 +73,7 @@ configure(bizBatchProjects) {
             }
         }
 
-        into "${distsDir}/${deployRootDir}/${confDir}"
+        into "${project.distsDir}/${deployRootDir}/${confDir}"
         include includeConfs
         presereveTimestamp()
     }
@@ -97,26 +97,12 @@ configure(bizBatchProjects) {
         }
     }
 
-    task zipDists(type: Zip, dependsOn: [copyShells, copyConfs, copyJars])  {
-
-        archiveName = distFilename
-        from "${distsDir}/${deployRootDir}"
-    }
+    task copyToDists(dependsOn:[copyShells, copyConfs, copyJars])
 
     ssh.settings { knownHosts = allowAnyHosts }
 
-    // サーバ接続情報
     remotes {
 
-        // 配布リソースの転送ユーザ
-        transferer {
-
-            host = deployHost
-            user = deployUser
-            password = deployPassword
-        }
-
-        // 配布リソースのデプロイユーザ
         deployer {
 
             host = deployHost
@@ -125,89 +111,66 @@ configure(bizBatchProjects) {
         }
     }
 
-    // 過去のデプロイリソース削除タスク
-    task deleteDeploiedBatch doLast {
+    task batchBackup doLast {
 
-        ssh.run {
+        ssh.run { session(remotes.deployer)  {
 
-            session(remotes.deployer)  {
-
-                def remove = { targetDir, targets ->
-                    targets.each{ execute("rm -f ${deployRootDir}/${targetDir}/${it}") }
-                }
-
-                remove(shellDir, removeShells)
-                remove(confDir, removeConfs)
-                remove(jarDir, removeJars)
-                remove(dependenciesDir, removeDependencies)
-            }
-        }
+            execute("cp -afr ${deployRootDir} ${deployBackupDir}")
+        }}
     }
 
-    task deployBatch(dependsOn: [zipDists, deleteDeploiedBatch]) doLast {
+    task batchRemove(dependsOn: batchBackup) doLast {
 
-        ssh.run {
+        ssh.run { session(remotes.deployer)  {
 
-            session(remotes.transferer)  {
+            def remove = { targetDir, targets ->
 
-                // 作業ディレクトリをクリーン
-                execute("rm -rf ${deployWorkDir}/*")
-                execute("mkdir -p -m ${modeDir} ${deployWorkDir}")
-
-                // 配布リソースを転送し、解凍
-                put from: "${distsDir}/${distFilename}", into: deployWorkDir
-                execute("unzip -o ${deployWorkDir}/${distFilename} -d ${deployWorkDir}")
+                targets.each{ execute("rm -f ${deployRootDir}/${targetDir}/${it}") }
             }
 
-            session(remotes.deployer)  {
+            remove(shellDir, removeShells)
+            remove(confDir, removeConfs)
+            remove(jarDir, removeJars)
+            remove(dependenciesDir, removeDependencies)
+        }}
+    }
 
-                // 他バージョンのJarを削除
-                includeJars.each{ execute("rm -f ${deployRootDir}/${jarDir}/${it}") }
-                includeDependencies.each{execute("rm -f ${deployRootDir}/${dependenciesDir}/${it}") }
+    task batchDeploy(dependsOn: [copyToDists, batchRemove]) doLast {
 
-                // デプロイ
-                execute("cp -ra ${deployWorkDir}/${deployRootDir} ${deployRootDir}")
+        ssh.run { session(remotes.deployer)  {
 
-                // 権限変更
-                def resourceOwner = remotes.deployer.user
-                def changeMode = { targetDir, mode ->
-                    execute("find ${deployRootDir}/${targetDir} -type f -user ${resourceOwner} | xargs chmod ${mode}")
-                }
+            // 他のバージョンのJarを削除
+            includeJars.each{ execute("rm -f ${deployRootDir}/${jarDir}/${it}") }
+            includeDependencies.each{execute("rm -f ${deployRootDir}/${dependenciesDir}/${it}") }
 
-                changeMode(shellDir, modeShell)
-                changeMode(confDir, modeConf)
-                changeMode(jarDir, modeJar)
-                execute("find ${deployRootDir}/${shellDir} ${deployRootDir}/${confDir} ${deployRootDir}/${jarDir} -type d -user ${resourceOwner} | xargs chmod ${modeDir}")
+            // デプロイ
+            put from: "${distsDir}/${deployRootDir}/${shellDir}", into: "${deployRootDir}/${shellDir}"
+            put from: "${distsDir}/${deployRootDir}/${confDir}", into: "${deployRootDir}/${confDir}"
+            put from: "${distsDir}/${deployRootDir}/${jarDir}", into: "${deployRootDir}/${jarDir}"
+            put from: "${distsDir}/${deployRootDir}/${dependenciesDir}", into: "${deployRootDir}/${dependenciesDir}"
+
+            // 権限変更
+            def resourceOwner = remotes.deployer.user
+            def changeMode = { targetDir, mode ->
+                execute("find ${deployRootDir}/${targetDir} -type f -user ${resourceOwner} | xargs chmod ${mode}")
             }
-        }
+
+            changeMode(shellDir, modeShell)
+            changeMode(confDir, modeConf)
+            changeMode(jarDir, modeJar)
+            changeMode(dependenciesDir, modeJar)
+
+            execute("find ${deployRootDir}/${shellDir} ${deployRootDir}/${confDir} ${deployRootDir}/${jarDir} -type d -user ${resourceOwner} | xargs chmod ${modeDir}")
+        }}
     }
 
-    // デプロイリソースを、差分比較用ディレクトリにコピー
-    task copyReleasedForDiff (type: CopyExtended){
+    task batchDiff(dependsOn: batchDeploy) doLast {
 
-       // 配布リソースをdiffにコピー
-        from "${distsDir}/${deployRootDir}"
-        into "${diffDeploiedDir}/${deployHost}"
-        presereveTimestamp()
+        ssh.run { session(remotes.deployer)  {
+
+            execute("diff -r ${deployRootDir} ${deployBackupDir}")
+        }}
     }
 
-    svntools {
-
-        username = svnUser
-        password = svnPassword
-    }
-
-    task commitReleasedForDiff(type: at.bxm.gradleplugins.svntools.tasks.SvnCommit, dependsOn: copyReleasedForDiff) doLast {
-
-        source <<  "${diffDeploiedDir}/${deployHost}"
-        commitMessage = svnCommitDeploiedMessage
-    }
-
-    task tagReleased(type: at.bxm.gradleplugins.svntools.tasks.SvnTag) {
-
-        tagName = version
-        commitMessage = svnTagMessage
-    }
-
-    task afterDeployBatch(dependsOn: [commitReleasedForDiff, tagReleased])
+    task deployBatch(dependsOn: batchDiff)
 }
