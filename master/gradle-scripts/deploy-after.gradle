@@ -1,0 +1,20 @@
+/*
+ * デプロイ後の処理
+ * ・実行タスク：afterDeploied
+ *
+ */
+apply plugin: 'at.bxm.svntools'
+
+svntools {
+
+    username = svnUser
+    password = svnPassword
+}
+
+task svnTag(type: at.bxm.gradleplugins.svntools.tasks.SvnTag) {
+
+    tagName = version
+    commitMessage = svnTagMessage
+}
+
+task afterDeploy(dependsOn: svnTag)
