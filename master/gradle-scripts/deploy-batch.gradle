@@ -3,7 +3,7 @@
  * ・実行タスク：deployBatch afterDeployBatch
  *
  */
-import sample.gradle.multi.tasks.CopyExtended
+import sample.gradle.multi.build.tasks.CopyExtended
 
  apply plugin: 'org.hidetake.ssh'
  apply plugin: 'at.bxm.svntools'
