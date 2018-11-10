@@ -12,23 +12,20 @@ ext {
     // 配布リソース情報
     distFilename = String.format("${deployRootDir}-%s.zip", new Date().format('yyyyMMdd'))
 
-    // デプロイリ対象リソースの指定がない場合のダミーファイル名
+    // デプロイ対象リソースの指定がない場合のダミーファイル名
     none = ['71f8e7976e4cbc4561c9d62fb283e7f788202acb'] // 「none」をsha1でハッシュ化した値
 
     // デプロイ対象リソース
     includeShells = getAsArray(deployShells)
     includeConfs = getAsArray(deployConfs)
-    includeJars = getAsJarArray(deproyJars)
-    includeDependencies = getAsJarArray(deproyDependencies)
+    includeJars = getJarsAsArray(deproyJars)
+    includeDependencies = getJarsAsArray(deproyDependencies)
 
     // 削除対象リソース
     removeShells = getAsArray(deleteShells)
     removeConfs = getAsArray(deleteConfs)
-    removeJars = getAsJarArray(deleteJars)
-    removeDependencies = getAsJarArray(deleteDependencies)
-
-    // デプロイしたリソースの差分比較用ディレクトリ
-    diffDeploiedDir= "${projectDir}/diff-deploied"
+    removeJars = getJarsAsArray(deleteJars)
+    removeDependencies = getJarsAsArray(deleteDependencies)
 }
 
 // プロパティファイルで指定されたリソースを、配列で取得する
@@ -38,7 +35,7 @@ def getAsArray(targets) {
 }
 
 // プロパティファイルで指定されたJarを、配列で取得する
-def getAsJarArray(targetJars) {
+def getJarsAsArray(targetJars) {
 
     return targetJars.trim().isEmpty() ? none : targetJars.split().collect{ "${it}-*.jar" }
 }
