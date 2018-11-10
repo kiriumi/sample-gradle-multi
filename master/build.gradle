@@ -5,9 +5,9 @@
  */
 ext{
     // ルートプロジェクトのMiscディレクトリ
-    masterMiscDir = file('misc')
-    checkstyleDir = file("${masterMiscDir}/checkstyle")
-    jacocoDir= file("${masterMiscDir}/jacoco")
+    rootMiscDir = file('misc')
+    checkstyleDir = file("${rootMiscDir}/checkstyle")
+    jacocoDir= file("${rootMiscDir}/jacoco")
 }
 
 // 外部Gradleスクリプトの適用
