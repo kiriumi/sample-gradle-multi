@@ -4,14 +4,18 @@
  */
 apply plugin: 'com.github.gmazzo.sqlite'
 
-project.ext.branchName = getBranchName()
+version = getBranchName()
 
 def getBranchName() {
 
     def gitHeadFile = file('../.git/HEAD')
     def snvDbFile = file('../.svn/wc.db')
 
-    if (gitHeadFile.exists()) {
+    if (project.hasProperty('branchName')) {
+        // Gradleプロパティファイル
+        return project.ext.branchName
+
+    } else if (gitHeadFile.exists()) {
         // Git
         return gitHeadFile.text.split('/')[2]
 
@@ -20,8 +24,8 @@ def getBranchName() {
         return getBranchNameSvn(snvDbFile)
 
     } else {
-        // Gradleプロパティファイル
-        return project.ext.branchName
+
+        return 'SNAPSHOT'
     }
 }
 
