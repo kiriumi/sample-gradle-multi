@@ -3,6 +3,8 @@
  * ・実行タスク：wrapper initSubrojects cleanEclipse eclipse
  *
  */
+import sample.gradle.multi.build.utils.Utils
+
 wrapper.gradleVersion = gradleWrapperVersion
 
 allprojects {
@@ -62,13 +64,13 @@ subprojects {
         // javaのソースディレクトリ作成（パッケージを含む）
         def makePackages = { javaSet ->
 
-            javaSet.srcDirs.each { makeDirIfNotExist(new File(it, packagePath)) }
+            javaSet.srcDirs.each { Utils.makeDirIfNotExists(new File(it, packagePath)) }
         }
 
         // resoucesのソースディレクトリ作成
         def makeResourceDir = { resourceSet ->
 
-            resourceSet.srcDirs.each { makeDirIfNotExist(it) }
+            resourceSet.srcDirs.each { Utils.makeDirIfNotExists(it) }
         }
 
         makePackages sourceSets.main.java
@@ -81,25 +83,19 @@ subprojects {
     task makeMiscDirs doLast {
 
         // DBマイグレーションSQLのディレクトリ
-        makeDirIfNotExist(new File(projectDir, dbMigreSqlDir))
+        Utils.makeDirIfNotExists(new File(projectDir, dbMigreSqlDir))
 
         // 外部リソースのディレクトリ
-        makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${shellDir}"))
-        makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${confDir}"))
+        Utils.makeDirIfNotExists(new File(projectDir, "${deployRootDir}/${shellDir}"))
+        Utils.makeDirIfNotExists(new File(projectDir, "${deployRootDir}/${confDir}"))
 
         // 各環境の外部リソースのディレクトリ
         envAfterUt.each {
 
-             makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${shellDir}_${it}"))
-             makeDirIfNotExist(new File(projectDir, "${deployRootDir}/${confDir}_${it}"))
+             Utils.makeDirIfNotExists(new File(projectDir, "${deployRootDir}/${shellDir}_${it}"))
+             Utils.makeDirIfNotExists(new File(projectDir, "${deployRootDir}/${confDir}_${it}"))
         }
     }
 
     task initSubprojects(dependsOn: [makeSourceSetsDirs, makeMiscDirs])
-}
-
-// ディレクトリ作成メソッド
-def makeDirIfNotExist(File dir) {
-
-     if(!dir.exists()) { dir.mkdirs() }
 }
