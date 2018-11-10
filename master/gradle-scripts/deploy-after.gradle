@@ -14,7 +14,7 @@ svntools {
 task svnTag(type: at.bxm.gradleplugins.svntools.tasks.SvnTag) {
 
     tagName = version
-    commitMessage = svnTagMessage
+    commitMessage = String.format(tagMessageFormat, version)
 }
 
 task afterDeploy(dependsOn: svnTag)
