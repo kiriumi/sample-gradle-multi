@@ -1,4 +1,4 @@
-package sample.gradle.multi.tasks
+package sample.gradle.multi.build.tasks
 
 import org.gradle.api.tasks.Copy
 
