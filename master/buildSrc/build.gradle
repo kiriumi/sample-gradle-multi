@@ -7,6 +7,11 @@ repositories {
     maven { url 'https://plugins.gradle.org/m2/' }
 }
 
+configurations.all {
+    // 使用するgroovy-allのバージョン競合回避のため、使用するバージョンを指定
+    resolutionStrategy { force group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.15' }
+}
+
 dependencies {
 
     implementation group: 'gradle.plugin.gmazzo', name: 'sqlite-plugin', version: '0.2'
